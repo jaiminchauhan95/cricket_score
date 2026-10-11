@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cricket Live Scoreboard & Scorer Tool</title>
+<style>
+  :root {
+    --primary: #1b4332;
+    --primary-light: #2d6a4f;
+    --accent: #d8f3dc;
+    --dark: #1e293b;
+    --light: #f8fafc;
+    --danger: #dc2626;
+    --border: #cbd5e1;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+  body { background: #f1f5f9; color: var(--dark); padding: 15px; }
+  .container { max-width: 1100px; margin: 0 auto; background: #fff; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); overflow: hidden; }
+  header { background: var(--primary); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+  header h1 { font-size: 20px; font-weight: bold; }
+  .btn-print { background: #fff; color: var(--primary); border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+  .match-info { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; padding: 15px; background: #f8fafc; border-bottom: 1px solid var(--border); }
+  .input-group label { display: block; font-size: 11px; font-weight: bold; text-transform: uppercase; color: #64748b; margin-bottom: 3px; }
+  .input-group input, .input-group select { width: 100%; padding: 6px 10px; border: 1px solid var(--border); border-radius: 5px; font-size: 13px; }
+  
+  /* Live Score Banner */
+  .score-banner { background: #e8f5e9; border: 2px solid #a5d6a7; margin: 15px; padding: 15px; border-radius: 8px; display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; text-align: center; }
+  .score-main { font-size: 32px; font-weight: 800; color: var(--primary); }
+  .crr-text { font-size: 14px; color: #475569; font-weight: 600; margin-top: 4px; }
+  
+  /* Scoring Buttons */
+  .controls { padding: 15px; background: #fff; border-bottom: 1px solid var(--border); text-align: center; }
+  .controls h3 { margin-bottom: 10px; font-size: 15px; color: var(--primary); }
+  .btn-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 12px; }
+  .ball-btn { min-width: 50px; height: 44px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 16px; font-weight: bold; cursor: pointer; background: white; transition: 0.15s; }
+  .ball-btn:hover { transform: translateY(-2px); box-shadow: 0 2px 5px rgba(0,0,0,0.15); }
+  .btn-dot { background: #f1f5f9; color: #475569; }
+  .btn-run { background: #e0f2fe; color: #0369a1; border-color: #7dd3fc; }
+  .btn-four { background: #fef3c7; color: #b45309; border-color: #fcd34d; }
+  .btn-six { background: #dcfce7; color: #15803d; border-color: #86efac; }
+  .btn-out { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
+  .btn-extra { background: #f3e8ff; color: #7e22ce; border-color: #d8b4fe; }
+  .btn-undo { background: #ffe4e6; color: #be123c; border-color: #fda4af; padding: 0 14px; }
+
+  /* Current Active Over Display */
+  .this-over { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 10px; font-weight: bold; }
+  .ball-circle { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; border: 1px solid #94a3b8; background: #fff; }
+
+  /* Tables */
+  .section-title { background: var(--primary-light); color: white; padding: 8px 15px; font-size: 13px; font-weight: bold; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th, td { border: 1px solid var(--border); padding: 7px 10px; text-align: left; }
+  th { background: #f8fafc; font-weight: 700; color: #334155; }
+  .text-center { text-align: center; }
+  .text-right { text-align: right; }
+  .highlight-row { background: #f0fdf4; font-weight: bold; }
+
+  /* Run Tally Ticker (1-100) */
+  .tally-container { padding: 15px; background: #fafafa; border-top: 1px solid var(--border); }
+  .tally-title { font-size: 12px; font-weight: bold; color: var(--primary); margin-bottom: 8px; }
+  .tally-grid { display: grid; grid-template-columns: repeat(20, 1fr); gap: 3px; }
+  .tally-box { border: 1px solid #cbd5e1; text-align: center; padding: 4px 0; font-size: 10px; background: #fff; border-radius: 2px; }
+  .tally-box.ticked { background: #22c55e; color: #fff; font-weight: bold; text-decoration: line-through; border-color: #16a34a; }
+
+  @media print {
+    body { background: #fff; padding: 0; }
+    .controls, .btn-print { display: none !important; }
+    .container { box-shadow: none; border-radius: 0; max-width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>🏏 Cricket Live Scorer & Sheet Tool</h1>
+    <button class="btn-print" onclick="window.print()">🖨️ Print Sheet</button>
+  </header>
+
+  <!-- Match Info -->
+  <div class="match-info">
+    <div class="input-group">
+      <label>Batting Team</label>
+      <input type="text" id="batTeam" value="Team A" onchange="updateUI()">
+    </div>
+    <div class="input-group">
+      <label>Bowling Team</label>
+      <input type="text" id="bowlTeam" value="Team B" onchange="updateUI()">
+    </div>
+    <div class="input-group">
+      <label>Max Overs</label>
+      <input type="number" id="maxOvers" value="20" onchange="updateUI()">
+    </div>
+    <div class="input-group">
+      <label>Striker Batsman</label>
+      <select id="strikerSelect" onchange="updateCurrentPlayers()"></select>
+    </div>
+    <div class="input-group">
+      <label>Non-Striker</label>
+      <select id="nonStrikerSelect" onchange="updateCurrentPlayers()"></select>
+    </div>
+    <div class="input-group">
+      <label>Current Bowler</label>
+      <select id="bowlerSelect" onchange="updateCurrentPlayers()"></select>
+    </div>
+  </div>
+
+  <!-- Score Banner -->
+  <div class="score-banner">
+    <div>
+      <div style="font-size: 14px; font-weight: bold; color: #2d6a4f;" id="bannerTeamName">Team A</div>
+      <div class="score-main"><span id="totalRuns">0</span> / <span id="totalWickets">0</span></div>
+      <div class="crr-text">Overs: <span id="oversCompleted">0.0</span> (<span id="oversMaxText">20</span>)</div>
+    </div>
+    <div>
+      <div>CRR: <b id="crrText">0.00</b></div>
+      <div>Extras: <b id="extrasText">0</b> (WD: <span id="wdText">0</span>, NB: <span id="nbText">0</span>)</div>
+    </div>
+    <div>
+      <div>Striker: <b id="currentStrikerText">-</b> (<span id="strikerScoreText">0</span>)</div>
+      <div>Bowler: <b id="currentBowlerText">-</b> (<span id="bowlerFigText">0-0</span>)</div>
+    </div>
+  </div>
+
+  <!-- Quick Scoring Buttons -->
+  <div class="controls">
+    <h3>Ball by Ball Entry (Click to Record)</h3>
+    <div class="btn-grid">
+      <button class="ball-btn btn-dot" onclick="addBall(0, false, false, false)">0 (Dot)</button>
+      <button class="ball-btn btn-run" onclick="addBall(1, false, false, false)">1</button>
+      <button class="ball-btn btn-run" onclick="addBall(2, false, false, false)">2</button>
+      <button class="ball-btn btn-run" onclick="addBall(3, false, false, false)">3</button>
+      <button class="ball-btn btn-four" onclick="addBall(4, false, false, false)">4 (Four)</button>
+      <button class="ball-btn btn-six" onclick="addBall(6, false, false, false)">6 (Six)</button>
+      <button class="ball-btn btn-extra" onclick="addBall(1, true, false, false)">Wide (WD)</button>
+      <button class="ball-btn btn-extra" onclick="addBall(1, false, true, false)">No Ball (NB)</button>
+      <button class="ball-btn btn-out" onclick="addBall(0, false, false, true)">Wicket (OUT)</button>
+      <button class="ball-btn btn-undo" onclick="undoLastBall()">↩ Undo</button>
+    </div>
+
+    <!-- Active Over Balls -->
+    <div class="this-over">
+      <span>This Over: </span>
+      <div id="thisOverBalls" style="display: flex; gap: 5px;"></div>
+    </div>
+  </div>
+
+  <!-- Batting Scorecard Table -->
+  <div class="section-title">BATTING SCORECARD</div>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 30px;">#</th>
+        <th>Batsman Name</th>
+        <th style="width: 140px;">Dismissal / How Out</th>
+        <th class="text-center" style="width: 60px;">Runs</th>
+        <th class="text-center" style="width: 60px;">Balls</th>
+        <th class="text-center" style="width: 50px;">4s</th>
+        <th class="text-center" style="width: 50px;">6s</th>
+        <th class="text-center" style="width: 70px;">S.R.</th>
+      </tr>
+    </thead>
+    <tbody id="battingTableBody"></tbody>
+  </table>
+
+  <!-- Bowling Scorecard Table -->
+  <div class="section-title" style="margin-top: 15px;">BOWLING ANALYSIS</div>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 30px;">#</th>
+        <th>Bowler Name</th>
+        <th class="text-center" style="width: 60px;">Overs</th>
+        <th class="text-center" style="width: 60px;">Maidens</th>
+        <th class="text-center" style="width: 60px;">Runs</th>
+        <th class="text-center" style="width: 60px;">Wickets</th>
+        <th class="text-center" style="width: 50px;">WD</th>
+        <th class="text-center" style="width: 50px;">NB</th>
+        <th class="text-center" style="width: 70px;">Econ</th>
+      </tr>
+    </thead>
+    <tbody id="bowlingTableBody"></tbody>
+  </table>
+
+  <!-- Run Tally Ticker (1-100) -->
+  <div class="tally-container">
+    <div class="tally-title">RUN TICKER (Runs automatically get ticked & crossed off)</div>
+    <div class="tally-grid" id="tallyGrid"></div>
+  </div>
+</div>
+
+<script>
+// Initial Data
+let batsmen = Array.from({length: 11}, (_, i) => ({
+  id: i + 1,
+  name: `Player ${i+1}`,
+  runs: 0,
+  balls: 0,
+  fours: 0,
+  sixes: 0,
+  howOut: i < 2 ? 'Not Out' : 'Yet to Bat',
+  isStriker: i === 0,
+  isNonStriker: i === 1
+}));
+
+let bowlers = Array.from({length: 6}, (_, i) => ({
+  id: i + 1,
+  name: `Bowler ${i+1}`,
+  ballsDelivered: 0,
+  maidens: 0,
+  runs: 0,
+  wickets: 0,
+  wides: 0,
+  noBalls: 0
+}));
+
+let totalRuns = 0;
+let totalWickets = 0;
+let legalBalls = 0;
+let extras = { wide: 0, noBall: 0, bye: 0, legBye: 0 };
+let currentOverBalls = [];
+let history = []; // for undo
+
+let strikerId = 1;
+let nonStrikerId = 2;
+let bowlerId = 1;
+
+function init() {
+  populateDropdowns();
+  createTallyGrid();
+  updateUI();
+}
+
+function createTallyGrid() {
+  const grid = document.getElementById('tallyGrid');
+  grid.innerHTML = '';
+  for (let i = 1; i <= 100; i++) {
+    const box = document.createElement('div');
+    box.className = 'tally-box';
+    box.id = `tally-${i}`;
+    box.innerText = i;
+    grid.appendChild(box);
+  }
+}
+
+function populateDropdowns() {
+  const strikerSel = document.getElementById('strikerSelect');
+  const nonStrikerSel = document.getElementById('nonStrikerSelect');
+  const bowlerSel = document.getElementById('bowlerSelect');
+
+  strikerSel.innerHTML = batsmen.map(b => `<option value="${b.id}" ${b.id===strikerId?'selected':''}>${b.name}</option>`).join('');
+  nonStrikerSel.innerHTML = batsmen.map(b => `<option value="${b.id}" ${b.id===nonStrikerId?'selected':''}>${b.name}</option>`).join('');
+  bowlerSel.innerHTML = bowlers.map(b => `<option value="${b.id}" ${b.id===bowlerId?'selected':''}>${b.name}</option>`).join('');
+}
+
+function updateCurrentPlayers() {
+  strikerId = parseInt(document.getElementById('strikerSelect').value);
+  nonStrikerId = parseInt(document.getElementById('nonStrikerSelect').value);
+  bowlerId = parseInt(document.getElementById('bowlerSelect').value);
+  updateUI();
+}
+
+function addBall(runs, isWide, isNoBall, isWicket) {
+  // Save state for undo
+  history.push(JSON.stringify({
+    batsmen: batsmen,
+    bowlers: bowlers,
+    totalRuns: totalRuns,
+    totalWickets: totalWickets,
+    legalBalls: legalBalls,
+    extras: extras,
+    currentOverBalls: currentOverBalls,
+    strikerId: strikerId,
+    nonStrikerId: nonStrikerId,
+    bowlerId: bowlerId
+  }));
+
+  const striker = batsmen.find(b => b.id === strikerId);
+  const bowler = bowlers.find(b => b.id === bowlerId);
+  let ballText = runs.toString();
+
+  if (isWide) {
+    extras.wide++;
+    totalRuns += (1 + runs);
+    bowler.runs += (1 + runs);
+    bowler.wides++;
+    ballText = runs > 0 ? `${runs}wd` : 'wd';
+  } else if (isNoBall) {
+    extras.noBall++;
+    totalRuns += (1 + runs);
+    bowler.runs += (1 + runs);
+    bowler.noBalls++;
+    striker.runs += runs;
+    striker.balls++;
+    if (runs === 4) striker.fours++;
+    if (runs === 6) striker.sixes++;
+    ballText = runs > 0 ? `${runs}nb` : 'nb';
+  } else if (isWicket) {
+    striker.balls++;
+    totalWickets++;
+    bowler.wickets++;
+    legalBalls++;
+    striker.howOut = `b ${bowler.name}`;
+    ballText = 'W';
+
+    // Auto promote next batter
+    const nextBatter = batsmen.find(b => b.howOut === 'Yet to Bat');
+    if (nextBatter) {
+      nextBatter.howOut = 'Not Out';
+      strikerId = nextBatter.id;
+    }
+  } else {
+    // Normal Ball
+    striker.runs += runs;
+    striker.balls++;
+    if (runs === 4) striker.fours++;
+    if (runs === 6) striker.sixes++;
+    bowler.runs += runs;
+    legalBalls++;
+    totalRuns += runs;
+  }
+
+  currentOverBalls.push(ballText);
+
+  // Strike rotation on 1, 3, 5 runs
+  if (!isWide && (runs === 1 || runs === 3)) {
+    const temp = strikerId;
+    strikerId = nonStrikerId;
+    nonStrikerId = temp;
+  }
+
+  // Check end of over (6 legal balls)
+  if (legalBalls > 0 && legalBalls % 6 === 0 && !isWide && !isNoBall) {
+    currentOverBalls = [];
+    bowler.ballsDelivered += 6;
+    // Swap strike at end of over
+    const temp = strikerId;
+    strikerId = nonStrikerId;
+    nonStrikerId = temp;
+  } else if (!isWide && !isNoBall) {
+    bowler.ballsDelivered++;
+  }
+
+  populateDropdowns();
+  updateUI();
+}
+
+function undoLastBall() {
+  if (history.length === 0) return;
+  const prevState = JSON.parse(history.pop());
+  batsmen = prevState.batsmen;
+  bowlers = prevState.bowlers;
+  totalRuns = prevState.totalRuns;
+  totalWickets = prevState.totalWickets;
+  legalBalls = prevState.legalBalls;
+  extras = prevState.extras;
+  currentOverBalls = prevState.currentOverBalls;
+  strikerId = prevState.strikerId;
+  nonStrikerId = prevState.nonStrikerId;
+  bowlerId = prevState.bowlerId;
+  populateDropdowns();
+  updateUI();
+}
+
+function updateUI() {
+  // Update Header Banner
+  const batTeamName = document.getElementById('batTeam').value || 'Team A';
+  const maxOversVal = document.getElementById('maxOvers').value || '20';
+  document.getElementById('bannerTeamName').innerText = batTeamName;
+  document.getElementById('oversMaxText').innerText = maxOversVal;
+  document.getElementById('totalRuns').innerText = totalRuns;
+  document.getElementById('totalWickets').innerText = totalWickets;
+
+  const completedOvers = Math.floor(legalBalls / 6);
+  const remainingBalls = legalBalls % 6;
+  const oversText = `${completedOvers}.${remainingBalls}`;
+  document.getElementById('oversCompleted').innerText = oversText;
+
+  const totalOversDec = completedOvers + (remainingBalls / 6);
+  const crr = totalOversDec > 0 ? (totalRuns / totalOversDec).toFixed(2) : '0.00';
+  document.getElementById('crrText').innerText = crr;
+
+  const totalExt = extras.wide + extras.noBall + extras.bye + extras.legBye;
+  document.getElementById('extrasText').innerText = totalExt;
+  document.getElementById('wdText').innerText = extras.wide;
+  document.getElementById('nbText').innerText = extras.noBall;
+
+  const striker = batsmen.find(b => b.id === strikerId);
+  const bowler = bowlers.find(b => b.id === bowlerId);
+  document.getElementById('currentStrikerText').innerText = striker ? striker.name : '-';
+  document.getElementById('strikerScoreText').innerText = striker ? `${striker.runs} (${striker.balls})` : '0';
+  document.getElementById('currentBowlerText').innerText = bowler ? bowler.name : '-';
+  document.getElementById('bowlerFigText').innerText = bowler ? `${bowler.wickets}-${bowler.runs}` : '0-0';
+
+  // Render Over Balls
+  const overCont = document.getElementById('thisOverBalls');
+  overCont.innerHTML = currentOverBalls.map(b => `<div class="ball-circle">${b}</div>`).join('');
+
+  // Render Batting Table
+  const batTbody = document.getElementById('battingTableBody');
+  batTbody.innerHTML = batsmen.map((b, idx) => {
+    const isAct = b.id === strikerId;
+    const isNonAct = b.id === nonStrikerId;
+    const sr = b.balls > 0 ? ((b.runs / b.balls) * 100).toFixed(1) : '0.0';
+    return `<tr class="${isAct ? 'highlight-row' : ''}">
+      <td>${b.id}</td>
+      <td>
+        <input type="text" value="${b.name}" style="border:none; background:transparent; font-weight:${isAct||isNonAct?'bold':'normal'}; width:120px;" 
+               onchange="batsmen[${idx}].name=this.value; populateDropdowns(); updateUI();">
+        ${isAct ? ' <span style="color:#16a34a; font-size:11px;">(Striker *)</span>' : ''}
+        ${isNonAct ? ' <span style="color:#0284c7; font-size:11px;">(Non-Striker)</span>' : ''}
+      </td>
+      <td>
+        <input type="text" value="${b.howOut}" style="border:none; background:transparent; font-size:11px; width:100%;"
+               onchange="batsmen[${idx}].howOut=this.value;">
+      </td>
+      <td class="text-center"><b>${b.runs}</b></td>
+      <td class="text-center">${b.balls}</td>
+      <td class="text-center">${b.fours}</td>
+      <td class="text-center">${b.sixes}</td>
+      <td class="text-center">${sr}</td>
+    </tr>`;
+  }).join('');
+
+  // Render Bowling Table
+  const bowlTbody = document.getElementById('bowlingTableBody');
+  bowlTbody.innerHTML = bowlers.map((b, idx) => {
+    const isCurBowl = b.id === bowlerId;
+    const o = `${Math.floor(b.ballsDelivered / 6)}.${b.ballsDelivered % 6}`;
+    const econ = b.ballsDelivered > 0 ? ((b.runs / (b.ballsDelivered / 6))).toFixed(2) : '0.00';
+    return `<tr class="${isCurBowl ? 'highlight-row' : ''}">
+      <td>${b.id}</td>
+      <td>
+        <input type="text" value="${b.name}" style="border:none; background:transparent; font-weight:${isCurBowl?'bold':'normal'}; width:140px;" 
+               onchange="bowlers[${idx}].name=this.value; populateDropdowns(); updateUI();">
+        ${isCurBowl ? ' <span style="color:#16a34a; font-size:11px;">(Bowling)</span>' : ''}
+      </td>
+      <td class="text-center"><b>${o}</b></td>
+      <td class="text-center">${b.maidens}</td>
+      <td class="text-center"><b>${b.runs}</b></td>
+      <td class="text-center"><b>${b.wickets}</b></td>
+      <td class="text-center">${b.wides}</td>
+      <td class="text-center">${b.noBalls}</td>
+      <td class="text-center">${econ}</td>
+    </tr>`;
+  }).join('');
+
+  // Update Run Ticker Grid (1 to 100)
+  for (let i = 1; i <= 100; i++) {
+    const box = document.getElementById(`tally-${i}`);
+    if (box) {
+      if (i <= totalRuns) {
+        box.classList.add('ticked');
+      } else {
+        box.classList.remove('ticked');
+      }
+    }
+  }
+}
+
+window.onload = init;
+</script>
+</body>
+</html>
