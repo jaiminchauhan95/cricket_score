@@ -1337,6 +1337,9 @@
           <span id="bannerTeamName">Team A</span>
           <span style="font-weight: 400; color: #94a3b8; font-size: 12px;" id="inningsLabelText">(Innings 1)</span>
         </div>
+        <div id="bannerMatchupSubtext" style="font-size: 11px; color: #a7f3d0; margin-top: 3px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px;">
+          🏏 Batting: <span id="bannerBatTeam">Team A</span> &nbsp;|&nbsp; 🎯 Bowling: <span id="bannerBowlTeam">Team B</span>
+        </div>
         <div class="score-digits">
           <span id="totalRuns">0</span>/<span id="totalWickets">0</span>
         </div>
@@ -1385,6 +1388,12 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- ACTIVE OVER BALLS TIMELINE (VISIBLE IN BOTH SCORER & SPECTATOR MODES) -->
+  <div class="over-timeline-container" id="overTimelineCard" style="margin-top: 10px; margin-bottom: 12px;">
+    <span class="over-timeline-title">This Over:</span>
+    <div class="balls-stream" id="thisOverBalls"></div>
   </div>
 
   <!-- SCORING KEYPAD & CONTROLS -->
@@ -1447,12 +1456,6 @@
         ↩
         <span class="sub-label">Undo</span>
       </button>
-    </div>
-
-    <!-- Active Over Balls Timeline -->
-    <div class="over-timeline-container">
-      <span class="over-timeline-title">This Over:</span>
-      <div class="balls-stream" id="thisOverBalls"></div>
     </div>
   </div>
 
@@ -1806,11 +1809,18 @@ function toggleViewerMode() {
 }
 
 function applyViewerModeUI() {
+  document.getElementById('matchConfigPanel').style.display = 'none';
   document.getElementById('scoringControlsPanel').style.display = 'none';
   document.getElementById('modeStatusBadge').style.display = 'inline-flex';
   document.getElementById('modeToggleBtn').innerText = '✏️ Scorer Mode';
   document.getElementById('inningsHeaderBtn').style.display = 'none';
   document.getElementById('newMatchHeaderBtn').style.display = 'none';
+
+  // Subtitles in scorecard
+  const batSub = document.querySelector('#battingScorecardHeader + span');
+  if (batSub) batSub.innerText = '(Live Player Scores)';
+  const bowlSub = document.querySelector('#bowlingScorecardHeader + span');
+  if (bowlSub) bowlSub.innerText = '(Live Bowling Figures)';
 
   // Make setup inputs read-only in spectator view
   document.getElementById('teamANameInput').disabled = true;
@@ -1825,11 +1835,17 @@ function applyViewerModeUI() {
 }
 
 function applyScorerModeUI() {
+  document.getElementById('matchConfigPanel').style.display = 'block';
   document.getElementById('scoringControlsPanel').style.display = 'block';
   document.getElementById('modeStatusBadge').style.display = 'none';
   document.getElementById('modeToggleBtn').innerText = '👁️ Viewer Mode';
   document.getElementById('inningsHeaderBtn').style.display = 'inline-flex';
   document.getElementById('newMatchHeaderBtn').style.display = 'inline-flex';
+
+  const batSub = document.querySelector('#battingScorecardHeader + span');
+  if (batSub) batSub.innerText = '(Click player name or dismissal to edit)';
+  const bowlSub = document.querySelector('#bowlingScorecardHeader + span');
+  if (bowlSub) bowlSub.innerText = '(Click bowler name to edit)';
 
   document.getElementById('teamANameInput').disabled = false;
   document.getElementById('teamBNameInput').disabled = false;
@@ -2587,6 +2603,10 @@ function updateUI() {
   const maxLegalBalls = maxOvers * 6;
 
   document.getElementById('bannerTeamName').innerText = batTeam;
+  const bannerBatEl = document.getElementById('bannerBatTeam');
+  if (bannerBatEl) bannerBatEl.innerText = batTeam;
+  const bannerBowlEl = document.getElementById('bannerBowlTeam');
+  if (bannerBowlEl) bannerBowlEl.innerText = bowlTeam;
   document.getElementById('oversMaxText').innerText = maxOvers;
   document.getElementById('totalRuns').innerText = totalRuns;
   document.getElementById('totalWickets').innerText = totalWickets;
