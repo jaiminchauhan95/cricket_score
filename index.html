@@ -85,35 +85,37 @@
     }
 
     .brand-icon {
-      font-size: 26px;
-      background: rgba(255, 255, 255, 0.15);
-      padding: 6px 10px;
+      width: 38px;
+      height: 38px;
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.25);
       border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
+      color: #ffffff;
+      flex-shrink: 0;
     }
 
     .brand-title h1 {
-      font-size: 22px;
+      font-size: 20px;
       font-weight: 800;
-      letter-spacing: -0.5px;
+      letter-spacing: -0.3px;
       color: #ffffff;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
 
     .mode-badge-indicator {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: rgba(239, 68, 68, 0.25);
-      border: 1px solid rgba(239, 68, 68, 0.5);
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid rgba(239, 68, 68, 0.45);
       color: #fecaca;
-      padding: 4px 10px;
+      padding: 3px 10px;
       border-radius: 20px;
       font-size: 11px;
       font-weight: 800;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.6px;
       text-transform: uppercase;
       animation: pulse 2s infinite;
     }
@@ -128,62 +130,69 @@
     .btn-header {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 8px 14px;
-      border-radius: var(--radius-sm);
+      justify-content: center;
+      padding: 7px 13px;
+      border-radius: 8px;
       font-weight: 700;
-      font-size: 13px;
-      border: none;
+      font-size: 12.5px;
+      border: 1px solid transparent;
       cursor: pointer;
-      transition: all 0.2s ease;
-      box-shadow: var(--shadow-sm);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
       user-select: none;
+      letter-spacing: 0.2px;
+      white-space: nowrap;
+    }
+
+    .btn-header:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.12);
     }
 
     .btn-header:active {
-      transform: scale(0.96);
+      transform: translateY(1px) scale(0.98);
     }
 
-    .btn-print { background: #ffffff; color: var(--primary); }
-    .btn-print:hover { background: #f8fafc; }
+    .btn-hub { background: #0284c7; color: #ffffff; border-color: rgba(255,255,255,0.2); }
+    .btn-hub:hover { background: #0369a1; }
 
-    .btn-excel { background: #10b981; color: #ffffff; }
+    .btn-print { background: #ffffff; color: #064e3b; font-weight: 800; border-color: rgba(0,0,0,0.06); }
+    .btn-print:hover { background: #f8fafc; color: #047857; }
+
+    .btn-excel { background: #10b981; color: #ffffff; border-color: rgba(255,255,255,0.2); }
     .btn-excel:hover { background: #059669; }
 
-    .btn-innings { background: #3b82f6; color: #ffffff; }
-    .btn-innings:hover { background: #2563eb; }
-
-    .btn-mode-toggle { background: #f59e0b; color: #ffffff; }
-    .btn-mode-toggle:hover { background: #d97706; }
-
-    .btn-share { background: #8b5cf6; color: #ffffff; }
+    .btn-share { background: #8b5cf6; color: #ffffff; border-color: rgba(255,255,255,0.2); }
     .btn-share:hover { background: #7c3aed; }
 
-    .btn-reset { background: rgba(255, 255, 255, 0.18); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.3); }
-    .btn-reset:hover { background: rgba(239, 68, 68, 0.9); }
+    .btn-mode-toggle { background: #f59e0b; color: #ffffff; border-color: rgba(255,255,255,0.2); }
+    .btn-mode-toggle:hover { background: #d97706; }
 
-    .btn-hub { background: #0284c7; color: #ffffff; }
-    .btn-hub:hover { background: #0369a1; }
+    .btn-innings { background: #2563eb; color: #ffffff; border-color: rgba(255,255,255,0.2); }
+    .btn-innings:hover { background: #1d4ed8; }
+
+    .btn-reset { background: rgba(255, 255, 255, 0.12); color: #ffffff; border-color: rgba(255, 255, 255, 0.25); }
+    .btn-reset:hover { background: rgba(239, 68, 68, 0.85); border-color: rgba(239, 68, 68, 0.9); }
 
     .match-badge-pill {
       display: inline-flex;
       align-items: center;
       gap: 5px;
-      background: rgba(255, 255, 255, 0.22);
-      border: 1px solid rgba(255, 255, 255, 0.38);
+      background: rgba(255, 255, 255, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.35);
       color: #ffffff;
       padding: 3px 10px;
       border-radius: 14px;
       font-size: 11px;
       font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.6px;
       cursor: pointer;
       margin-top: 3px;
       transition: all 0.2s;
     }
     .match-badge-pill:hover {
-      background: rgba(255, 255, 255, 0.35);
+      background: rgba(255, 255, 255, 0.3);
       transform: translateY(-1px);
     }
 
@@ -1100,7 +1109,7 @@
       box-shadow: 0 1px 3px rgba(16, 185, 129, 0.3);
     }
 
-    /* WICKET MODAL */
+    /* WICKET & ACTION MODALS */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -1116,56 +1125,163 @@
     .modal-card {
       background: #ffffff;
       width: 100%;
-      max-width: 440px;
-      border-radius: var(--radius-md);
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+      max-width: 480px;
+      border-radius: var(--radius-lg);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(0, 0, 0, 0.05);
       overflow: hidden;
-      animation: modalFadeIn 0.2s ease;
+      animation: modalFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     @keyframes modalFadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+      from { opacity: 0; transform: translateY(12px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
     .modal-header {
       background: var(--danger);
       color: #ffffff;
-      padding: 14px 18px;
+      padding: 14px 20px;
       font-weight: 800;
       font-size: 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      letter-spacing: -0.2px;
+    }
+
+    .modal-close-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      line-height: 1;
+      cursor: pointer;
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.16);
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+
+    .modal-close-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.08);
     }
 
     .modal-body {
-      padding: 18px;
+      padding: 20px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 14px;
+      background: #ffffff;
+    }
+
+    .modal-body .input-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .modal-body .input-field label {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #334155;
+      letter-spacing: 0.2px;
+    }
+
+    .modal-body .input-field input,
+    .modal-body .input-field select {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #0f172a;
+      background: #f8fafc;
+      transition: all 0.2s ease;
+      outline: none;
+    }
+
+    .modal-body .input-field input:focus,
+    .modal-body .input-field select:focus {
+      border-color: #059669;
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15);
+    }
+
+    .modal-body .preset-pill {
+      background: #f1f5f9;
+      color: #334155;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .modal-body .preset-pill:hover,
+    .modal-body .preset-pill.active {
+      background: #059669;
+      color: #ffffff;
+      border-color: #059669;
+      transform: translateY(-1px);
     }
 
     .modal-footer {
-      padding: 12px 18px;
+      padding: 14px 20px;
       background: #f8fafc;
       border-top: 1px solid var(--border-color);
       display: flex;
       justify-content: flex-end;
-      gap: 8px;
+      align-items: center;
+      gap: 10px;
     }
 
     .btn-modal {
-      padding: 8px 16px;
-      border-radius: var(--radius-sm);
+      padding: 9px 18px;
+      border-radius: 8px;
       font-weight: 700;
-      font-size: 13px;
+      font-size: 13.5px;
       cursor: pointer;
-      border: none;
+      border: 1px solid transparent;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      user-select: none;
+      white-space: nowrap;
     }
 
-    .btn-modal-cancel { background: #e2e8f0; color: #334155; }
-    .btn-modal-confirm { background: var(--danger); color: #ffffff; }
+    .btn-modal-cancel {
+      background: #ffffff;
+      color: #475569;
+      border-color: #cbd5e1;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-modal-cancel:hover {
+      background: #f1f5f9;
+      color: #0f172a;
+      border-color: #94a3b8;
+    }
+
+    .btn-modal-confirm {
+      background: #059669;
+      color: #ffffff;
+      box-shadow: 0 2px 4px rgba(5, 150, 105, 0.25);
+    }
+
+    .btn-modal-confirm:hover {
+      background: #047857;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(5, 150, 105, 0.3);
+    }
+
+    .btn-modal:active {
+      transform: scale(0.98);
+    }
 
     /* FOOTER */
     footer {
@@ -1326,40 +1442,47 @@
   <!-- HEADER -->
   <header>
     <div class="brand-title">
-      <div class="brand-icon">🏏</div>
+      <div class="brand-icon" title="Cricket Live Scorer">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10" stroke="#ffffff" fill="#ef4444"/>
+          <path d="M7 3.3a14 14 0 0 1 0 17.4" stroke="#ffffff" stroke-dasharray="1.5 1.5"/>
+          <path d="M17 3.3a14 14 0 0 0 0 17.4" stroke="#ffffff" stroke-dasharray="1.5 1.5"/>
+        </svg>
+      </div>
       <div>
         <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
           <h1 id="appHeaderTitle">Cricket Live Scorer</h1>
           <div id="activeMatchBadge" class="match-badge-pill" onclick="openMatchesHubModal()" title="Click to view all matches or switch">
-            🏆 <span id="activeMatchIdDisplay">Match: M1</span>
+            <span class="live-dot" style="width:6px; height:6px;"></span>
+            <span id="activeMatchIdDisplay">Match: M1</span>
           </div>
         </div>
         <div id="modeStatusBadge" class="mode-badge-indicator" style="display:none;">
-          <span class="live-dot"></span> 🔴 LIVE SPECTATOR VIEW (READ ONLY)
+          <span class="live-dot"></span> LIVE SPECTATOR VIEW (READ ONLY)
         </div>
       </div>
     </div>
     <div class="header-actions">
       <button class="btn-header btn-hub" onclick="openMatchesHubModal()" title="View All Live Matches & Switch Ground">
-        🏆 Matches Hub
+        Matches Hub
       </button>
       <button class="btn-header btn-print" onclick="handlePrint()" title="Print Complete Match Scorecard (Both Teams)">
-        🖨️ Print (PDF)
+        Print (PDF)
       </button>
       <button class="btn-header btn-excel" onclick="handleExcelExport()" title="Download Complete Excel Sheet (Both Teams)">
-        📊 Excel
+        Excel
       </button>
       <button class="btn-header btn-share" onclick="shareLiveViewerLink()" title="Copy & Share Live Spectator Link">
-        🔗 Share Live Link
+        Share Link
       </button>
       <button class="btn-header btn-mode-toggle" id="modeToggleBtn" onclick="toggleViewerMode()" title="Toggle between Scorer Mode and Spectator Mode">
-        👁️ Viewer Mode
+        Viewer Mode
       </button>
       <button class="btn-header btn-innings" id="inningsHeaderBtn" onclick="handleSwitchInnings()" title="Switch Innings (Team A / Team B)">
-        ⇄ Switch Innings
+        Switch Innings
       </button>
       <button class="btn-header btn-reset" id="newMatchHeaderBtn" onclick="confirmResetMatch()" title="Reset current match scorecard">
-        🔄 Reset Score
+        Reset Score
       </button>
     </div>
   </header>
@@ -1369,14 +1492,14 @@
     <span id="matchAlertMessage"></span>
     <div class="alert-action-group">
       <button class="btn-header" style="background:#064e3b; color:#fff; font-size:11px; padding:4px 8px;" id="alertActionBtn" onclick="handleAlertAction()">Action</button>
-      <button class="btn-header" style="background:#475569; color:#fff; font-size:11px; padding:4px 8px; display:none;" id="alertUnlockBtn" onclick="unlockMatch()">🔓 Resume / Edit</button>
+      <button class="btn-header" style="background:#475569; color:#fff; font-size:11px; padding:4px 8px; display:none;" id="alertUnlockBtn" onclick="unlockMatch()">Resume / Edit</button>
     </div>
   </div>
 
   <!-- MATCH CONFIGURATION & TEAMS MANAGEMENT -->
   <div class="match-config-panel" id="matchConfigPanel">
     <div class="setup-heading">
-      <span class="setup-heading-title">⚙️ Match Configuration &amp; Teams Management</span>
+      <span class="setup-heading-title">Match Configuration &amp; Teams Management</span>
       <span class="setup-heading-subtitle">Set Team Names, Batting First &amp; Total Overs</span>
     </div>
 
@@ -1424,7 +1547,7 @@
           </div>
         </div>
         <div class="overs-calc-note" id="oversCalcNote">
-          ⚡ 20 Overs = 120 Legal Balls per Innings
+          20 Overs = 120 Legal Balls (6 balls/over)
         </div>
       </div>
     </div>
@@ -1434,7 +1557,7 @@
       <div class="pitch-matchup-header">
         <span class="innings-indicator-badge" id="currentInningsBadge">1ST INNINGS</span>
         <span class="matchup-text" id="currentMatchupText">
-          🏏 Batting: <b id="matchupBatTeam">Team A</b> &nbsp;|&nbsp; 🎯 Bowling: <b id="matchupBowlTeam">Team B</b>
+          Batting: <b id="matchupBatTeam">Team A</b> &nbsp;|&nbsp; Bowling: <b id="matchupBowlTeam">Team B</b>
         </span>
       </div>
 
@@ -1466,7 +1589,7 @@
           <span style="font-weight: 400; color: #94a3b8; font-size: 12px;" id="inningsLabelText">(Innings 1)</span>
         </div>
         <div id="bannerMatchupSubtext" style="font-size: 11px; color: #a7f3d0; margin-top: 3px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px;">
-          🏏 Batting: <span id="bannerBatTeam">Team A</span> &nbsp;|&nbsp; 🎯 Bowling: <span id="bannerBowlTeam">Team B</span>
+          Batting: <span id="bannerBatTeam">Team A</span> &nbsp;|&nbsp; Bowling: <span id="bannerBowlTeam">Team B</span>
         </div>
         <div class="score-digits">
           <span id="totalRuns">0</span>/<span id="totalWickets">0</span>
@@ -1511,7 +1634,7 @@
           <span class="rate-val" id="nonStrikerScoreText">0 (0)</span>
         </div>
         <div class="player-stat-row" style="margin-top: 4px; border-top: 1px dashed rgba(255,255,255,0.2); padding-top: 4px;">
-          <span style="color: #cbd5e1; font-weight: 500;">🎯 <span id="currentBowlerText">Player B1</span></span>
+          <span style="color: #cbd5e1; font-weight: 500;">Bowler: <span id="currentBowlerText">Player B1</span></span>
           <span class="rate-val" id="bowlerFigText">0-0 (0.0)</span>
         </div>
       </div>
@@ -1527,10 +1650,10 @@
   <!-- SCORING KEYPAD & CONTROLS -->
   <div class="controls-panel" id="scoringControlsPanel">
     <div class="panel-heading-row">
-      <h2>⚡ Ball-by-Ball Quick Scoring</h2>
+      <h2>Ball-by-Ball Quick Scoring</h2>
       <div class="controls-action-group">
         <button class="strike-swap-btn" onclick="manualSwapStrike()" title="Swap Strike Between Batsmen">
-          ⇄ Swap Strike
+          Swap Strike
         </button>
       </div>
     </div>
@@ -1581,8 +1704,8 @@
         <span class="sub-label">Wicket</span>
       </button>
       <button class="key-btn key-undo" onclick="undoLastBall()">
-        ↩
-        <span class="sub-label">Undo</span>
+        UNDO
+        <span class="sub-label">Revert</span>
       </button>
     </div>
   </div>
@@ -1599,7 +1722,7 @@
 
   <!-- BATTING SCORECARD TABLE -->
   <div class="section-banner">
-    <span id="battingScorecardHeader">🏏 BATTING SCORECARD - TEAM A</span>
+    <span id="battingScorecardHeader">BATTING SCORECARD - TEAM A</span>
     <span style="font-size: 12px; font-weight: normal; opacity: 0.85;">(Click player name or dismissal to edit)</span>
   </div>
   <div class="table-responsive">
@@ -1630,7 +1753,7 @@
 
   <!-- BOWLING SCORECARD TABLE -->
   <div class="section-banner" style="margin-top: 10px;">
-    <span id="bowlingScorecardHeader">🎯 BOWLING ANALYSIS - TEAM B</span>
+    <span id="bowlingScorecardHeader">BOWLING ANALYSIS - TEAM B</span>
     <span style="font-size: 12px; font-weight: normal; opacity: 0.85;">(Click bowler name to edit)</span>
   </div>
   <div class="table-responsive">
@@ -1655,7 +1778,7 @@
   <!-- OVER-BY-OVER PROGRESSION CAROUSEL -->
   <div class="over-summary-section" id="overSummarySection" style="display: none;">
     <div class="over-summary-header">
-      <span class="over-summary-title">📈 Over-by-Over Progression</span>
+      <span class="over-summary-title">Over-by-Over Progression</span>
       <span style="font-size: 11px; color: #64748b;" id="oversProgressionCount">0 Overs</span>
     </div>
     <div class="over-summary-stream" id="overSummaryStream"></div>
@@ -1664,7 +1787,7 @@
   <!-- RUN TICKER SECTION -->
   <div class="tally-wrapper" id="tallyWrapperSection">
     <div class="tally-header">
-      <div class="tally-title">☑️ Official Run Tally (Runs Automatically Crossed Off)</div>
+      <div class="tally-title">Run Tally Tracker (1 to 100)</div>
       <div style="font-size: 11px; color: #64748b;" id="tallyRangeText">1 to 100 Tracker</div>
     </div>
     <div class="tally-grid" id="tallyGrid"></div>
@@ -1766,8 +1889,8 @@
 <div class="modal-overlay" id="wicketModal">
   <div class="modal-card">
     <div class="modal-header">
-      <span>Wicket Fallen!</span>
-      <span style="cursor: pointer; font-size: 20px;" onclick="closeWicketModal()">&times;</span>
+      <span>Wicket Fallen</span>
+      <span class="modal-close-btn" onclick="closeWicketModal()">&times;</span>
     </div>
     <div class="modal-body">
       <div class="input-field">
@@ -1805,21 +1928,19 @@
 <div class="modal-overlay" id="matchesHubModal">
   <div class="modal-card" style="max-width: 580px;">
     <div class="modal-header" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);">
-      <span style="display:flex; align-items:center; gap:8px;">
-        <span>🏆</span> <span>Live Matches &amp; Tournament Hub</span>
-      </span>
-      <span style="cursor: pointer; font-size: 24px; line-height: 1;" onclick="closeMatchesHubModal()">&times;</span>
+      <span style="font-weight: 800; font-size: 16px;">Live Matches Hub</span>
+      <span class="modal-close-btn" onclick="closeMatchesHubModal()">&times;</span>
     </div>
     <div class="modal-body" style="padding: 16px;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
         <span style="font-size: 13px; font-weight: 700; color: #475569;" id="hubMatchesCountText">Active Matches</span>
-        <button class="btn-modal btn-modal-confirm" style="background: #10b981; font-size: 12px; padding: 6px 14px;" onclick="openCreateMatchModal()">
-          ➕ Start New Match
+        <button class="btn-modal btn-modal-confirm" style="background: #10b981; font-size: 12.5px; padding: 7px 14px;" onclick="openCreateMatchModal()">
+          New Match
         </button>
       </div>
       <div class="matches-grid" id="matchesListContainer">
         <div style="text-align: center; padding: 24px; color: #64748b;">
-          ⏳ Loading matches...
+          Loading matches...
         </div>
       </div>
     </div>
@@ -1833,45 +1954,45 @@
 <!-- CREATE NEW MATCH MODAL -->
 <div class="modal-overlay" id="createMatchModal">
   <div class="modal-card" style="max-width: 480px;">
-    <div class="modal-header" style="background: linear-gradient(135deg, #065f46 0%, #047857 100%);">
-      <span style="display:flex; align-items:center; gap:8px;">
-        <span>➕</span> <span>Create &amp; Start New Match</span>
-      </span>
-      <span style="cursor: pointer; font-size: 24px; line-height: 1;" onclick="closeCreateMatchModal()">&times;</span>
+    <div class="modal-header" style="background: linear-gradient(135deg, #064e3b 0%, #047857 100%);">
+      <span style="font-weight: 800; font-size: 16px; letter-spacing: 0.2px;">Create &amp; Start New Match</span>
+      <span class="modal-close-btn" onclick="closeCreateMatchModal()">&times;</span>
     </div>
-    <div class="modal-body" style="padding: 18px;">
+    <div class="modal-body" style="padding: 20px;">
       <div class="input-field">
-        <label>Match Code / ID <span style="color:#0284c7; font-size:11px;">(Unique code for URL, e.g. M1, Ground2)</span></label>
-        <input type="text" id="newMatchCodeInput" placeholder="e.g. M1 or Sarsa-Anand" style="padding:8px 10px; border:1.5px solid #cbd5e1; border-radius:6px; font-weight:700;">
+        <label>Match Code / ID <span style="color:#0284c7; font-size:11px; font-weight:500;">(Unique code for URL, e.g. M1, Ground2)</span></label>
+        <input type="text" id="newMatchCodeInput" placeholder="e.g. M1 or Sarsa-Anand">
       </div>
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
         <div class="input-field">
           <label>Team A (Name)</label>
-          <input type="text" id="newTeamANameInput" value="Team A" placeholder="e.g. Sarsa" style="padding:8px 10px; border:1.5px solid #cbd5e1; border-radius:6px; font-weight:700;">
+          <input type="text" id="newTeamANameInput" value="Team A" placeholder="e.g. Sarsa">
         </div>
         <div class="input-field">
           <label>Team B (Name)</label>
-          <input type="text" id="newTeamBNameInput" value="Team B" placeholder="e.g. Anand" style="padding:8px 10px; border:1.5px solid #cbd5e1; border-radius:6px; font-weight:700;">
+          <input type="text" id="newTeamBNameInput" value="Team B" placeholder="e.g. Anand">
         </div>
       </div>
       <div class="input-field" style="margin-top: 4px;">
         <label>Total Overs per Innings</label>
         <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-          <input type="number" id="newMatchOversInput" value="20" min="1" max="100" style="width: 80px; padding:8px 10px; border:1.5px solid #cbd5e1; border-radius:6px; font-weight:700;">
-          <button type="button" class="preset-pill" onclick="document.getElementById('newMatchOversInput').value=5">5 Ov</button>
-          <button type="button" class="preset-pill" onclick="document.getElementById('newMatchOversInput').value=10">10 Ov</button>
-          <button type="button" class="preset-pill" onclick="document.getElementById('newMatchOversInput').value=20">20 Ov</button>
-          <button type="button" class="preset-pill" onclick="document.getElementById('newMatchOversInput').value=50">50 Ov</button>
+          <input type="number" id="newMatchOversInput" value="20" min="1" max="100" style="width: 80px; text-align: center;">
+          <div class="preset-pill-group">
+            <button type="button" class="preset-pill" onclick="document.getElementById('newMatchOversInput').value=5">5 Ov</button>
+            <button type="button" class="preset-pill" onclick="document.getElementById('newMatchOversInput').value=10">10 Ov</button>
+            <button type="button" class="preset-pill" onclick="document.getElementById('newMatchOversInput').value=20">20 Ov</button>
+            <button type="button" class="preset-pill" onclick="document.getElementById('newMatchOversInput').value=50">50 Ov</button>
+          </div>
         </div>
       </div>
       <div class="input-field" style="margin-top: 4px;">
-        <label>Scorer Security PIN <span style="font-size:11px; color:#64748b;">(Protects scoring from spectators)</span></label>
-        <input type="text" id="newMatchPinInput" value="1234" maxlength="10" placeholder="e.g. 1234" style="padding:8px 10px; border:1.5px solid #cbd5e1; border-radius:6px; font-weight:700;">
+        <label>Scorer Security PIN <span style="font-size:11px; color:#64748b; font-weight:500;">(Protects scoring from spectators)</span></label>
+        <input type="text" id="newMatchPinInput" value="1234" maxlength="10" placeholder="e.g. 1234">
       </div>
     </div>
     <div class="modal-footer">
       <button class="btn-modal btn-modal-cancel" onclick="closeCreateMatchModal()">Cancel</button>
-      <button class="btn-modal btn-modal-confirm" style="background:#059669;" onclick="submitCreateNewMatch()">🚀 Start Scoring Match</button>
+      <button class="btn-modal btn-modal-confirm" style="background:#059669;" onclick="submitCreateNewMatch()">Start Scoring Match</button>
     </div>
   </div>
 </div>
@@ -2088,12 +2209,12 @@ function submitCreateNewMatch() {
   const newUrl = `${window.location.origin}${window.location.pathname}?match=${encodeURIComponent(currentMatchId)}`;
   window.history.pushState({ match: currentMatchId }, '', newUrl);
 
-  alert(`🎉 Match [${currentMatchId.toUpperCase()}] Created Successfully!\n\n${teamAName} vs ${teamBName} (${maxOvers} Overs)\nScorer PIN: ${currentScorerPin}\n\nYou can now start live scoring!`);
+  alert(`Match [${currentMatchId.toUpperCase()}] Created Successfully!\n\n${teamAName} vs ${teamBName} (${maxOvers} Overs)\nScorer PIN: ${currentScorerPin}\n\nYou can now start live scoring!`);
 }
 
 function fetchMatchesList() {
   const container = document.getElementById('matchesListContainer');
-  container.innerHTML = `<div style="text-align: center; padding: 24px; color: #64748b;">⏳ Loading all live matches...</div>`;
+  container.innerHTML = `<div style="text-align: center; padding: 24px; color: #64748b;">Loading all live matches...</div>`;
 
   fetch('api.php?action=list', { cache: 'no-store' })
     .then(res => res.json())
@@ -2101,7 +2222,7 @@ function fetchMatchesList() {
       if (data && data.status === 'success' && Array.isArray(data.matches)) {
         renderMatchesList(data.matches);
       } else {
-        container.innerHTML = `<div style="text-align:center; padding: 20px; color:#64748b;">No matches found. Click '+ Start New Match' to create one!</div>`;
+        container.innerHTML = `<div style="text-align:center; padding: 20px; color:#64748b;">No matches found. Click 'New Match' to create one!</div>`;
       }
     })
     .catch(() => {
@@ -2117,11 +2238,10 @@ function renderMatchesList(matches) {
   if (matches.length === 0) {
     container.innerHTML = `
       <div style="text-align: center; padding: 30px; color: #64748b; background:#f8fafc; border-radius:8px; border:1px dashed #cbd5e1;">
-        <div style="font-size:32px; margin-bottom:8px;">🏏</div>
         <div style="font-weight:700; color:#334155; margin-bottom:4px;">No active matches yet</div>
         <div style="font-size:12px; margin-bottom:12px;">Create your first match to start live scoring!</div>
         <button class="btn-modal btn-modal-confirm" style="background: #10b981;" onclick="openCreateMatchModal()">
-          ➕ Start New Match
+          New Match
         </button>
       </div>`;
     return;
@@ -2132,7 +2252,7 @@ function renderMatchesList(matches) {
     const updatedSecAgo = m.updatedAt ? Math.max(0, Math.floor((Date.now() / 1000) - m.updatedAt)) : 0;
     let timeText = updatedSecAgo < 60 ? `${updatedSecAgo}s ago` : `${Math.floor(updatedSecAgo / 60)}m ago`;
     const statusPill = m.matchFinished
-      ? `<span style="background:#fee2e2; color:#b91c1c; font-size:10px; font-weight:800; padding:2px 6px; border-radius:10px;">✅ FINISHED</span>`
+      ? `<span style="background:#fee2e2; color:#b91c1c; font-size:10px; font-weight:800; padding:2px 6px; border-radius:10px;">FINISHED</span>`
       : `<span style="background:#dcfce7; color:#15803d; font-size:10px; font-weight:800; padding:2px 6px; border-radius:10px;"><span class="live-dot" style="width:6px; height:6px;"></span> LIVE</span>`;
 
     return `
@@ -2143,10 +2263,10 @@ function renderMatchesList(matches) {
             ${statusPill}
             ${isActive ? '<span style="font-size:11px; font-weight:800; color:#059669;">(Currently Open)</span>' : ''}
           </div>
-          <span style="font-size:11px; color:#64748b;">🕒 ${timeText}</span>
+          <span style="font-size:11px; color:#64748b;">${timeText}</span>
         </div>
         <div class="match-card-teams">
-          🏏 ${m.teamAName} vs ${m.teamBName}
+          ${m.teamAName} vs ${m.teamBName}
         </div>
         <div class="match-card-score">
           <span>Score: <b>${m.totalRuns}/${m.totalWickets}</b> (${m.overs}/${m.maxOvers} Ov)</span>
@@ -2154,13 +2274,13 @@ function renderMatchesList(matches) {
         </div>
         <div class="match-card-actions">
           <button class="btn-match-action btn-match-watch" onclick="switchToMatch('${m.id}', true)">
-            👁️ Watch Live
+            Watch Live
           </button>
           <button class="btn-match-action btn-match-score" onclick="switchToMatch('${m.id}', false, '${m.scorerPin || '1234'}')">
-            ✏️ Score Match
+            Score Match
           </button>
           <button class="btn-match-action btn-match-delete" onclick="deleteMatchConfirm('${m.id}')" title="Delete Match">
-            🗑️
+            Delete
           </button>
         </div>
       </div>
@@ -2177,7 +2297,7 @@ function switchToMatch(matchId, asViewer, expectedPin) {
     if (pin === expectedPin || pin === '1234' || pin === 'admin') {
       window.location.href = `?match=${encodeURIComponent(matchId)}`;
     } else if (pin !== null) {
-      alert("❌ Incorrect PIN for this match!");
+      alert("Incorrect PIN for this match!");
     }
   }
 }
@@ -2224,16 +2344,16 @@ function toggleViewerMode() {
     isViewerMode = true;
     applyViewerModeUI();
     startViewerPolling();
-    alert("👁️ Switched to Spectator (Viewer) Mode!\nScoring buttons are hidden and scores are read-only.");
+    alert("Switched to Spectator (Viewer) Mode!\nScoring buttons are hidden and scores are read-only.");
   } else {
     const pin = prompt(`Enter Scorer PIN for Match [${currentMatchId.toUpperCase()}]:\n(Default PIN: 1234)`, "");
     if (pin === currentScorerPin || pin === DEFAULT_SCORER_PIN || pin === 'admin') {
       isViewerMode = false;
       stopViewerPolling();
       applyScorerModeUI();
-      alert("✏️ Scorer Mode unlocked! You can now score balls and edit match details.");
+      alert("Scorer Mode unlocked! You can now score balls and edit match details.");
     } else if (pin !== null) {
-      alert("❌ Incorrect PIN! Remaining in Spectator Mode.");
+      alert("Incorrect PIN! Remaining in Spectator Mode.");
     }
   }
 }
@@ -2242,7 +2362,7 @@ function applyViewerModeUI() {
   document.getElementById('matchConfigPanel').style.display = 'none';
   document.getElementById('scoringControlsPanel').style.display = 'none';
   document.getElementById('modeStatusBadge').style.display = 'inline-flex';
-  document.getElementById('modeToggleBtn').innerText = '✏️ Scorer Mode';
+  document.getElementById('modeToggleBtn').innerText = 'Scorer Mode';
   document.getElementById('inningsHeaderBtn').style.display = 'none';
   document.getElementById('newMatchHeaderBtn').style.display = 'none';
 
@@ -2266,7 +2386,7 @@ function applyScorerModeUI() {
   document.getElementById('matchConfigPanel').style.display = 'block';
   document.getElementById('scoringControlsPanel').style.display = 'block';
   document.getElementById('modeStatusBadge').style.display = 'none';
-  document.getElementById('modeToggleBtn').innerText = '👁️ Viewer Mode';
+  document.getElementById('modeToggleBtn').innerText = 'Viewer Mode';
   document.getElementById('inningsHeaderBtn').style.display = 'inline-flex';
   document.getElementById('newMatchHeaderBtn').style.display = 'inline-flex';
 
@@ -2290,7 +2410,7 @@ function shareLiveViewerLink() {
   const viewerUrl = `${window.location.origin}${window.location.pathname}?match=${encodeURIComponent(currentMatchId)}&view=live`;
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(viewerUrl).then(() => {
-      alert(`📋 Spectator Live Link Copied to Clipboard!\n\nMatch: ${currentMatchId.toUpperCase()} (${teamAName} vs ${teamBName})\n${viewerUrl}\n\nShare this link on WhatsApp or with spectators. They will see the live score in read-only mode!`);
+      alert(`Spectator Live Link Copied to Clipboard!\n\nMatch: ${currentMatchId.toUpperCase()} (${teamAName} vs ${teamBName})\n${viewerUrl}\n\nShare this link with spectators. They will see the live score in read-only mode!`);
     }).catch(() => {
       prompt("Copy Spectator Live Link:", viewerUrl);
     });
@@ -2401,7 +2521,7 @@ function onTeamSetupChange() {
 
   // Update total balls note
   const totalBalls = maxOvers * 6;
-  document.getElementById('oversCalcNote').innerText = `⚡ ${maxOvers} Overs = ${totalBalls} Legal Balls per Innings`;
+  document.getElementById('oversCalcNote').innerText = `${maxOvers} Overs = ${totalBalls} Legal Balls (6 balls/over)`;
 
   syncTeamSquadsAndRoles();
   createTallyGrid();
@@ -2436,8 +2556,8 @@ function syncTeamSquadsAndRoles() {
   document.getElementById('nonStrikerTeamLabel').innerText = batTeam;
   document.getElementById('bowlerTeamLabel').innerText = bowlTeam;
   document.getElementById('bannerTeamName').innerText = batTeam;
-  document.getElementById('battingScorecardHeader').innerText = `🏏 BATTING SCORECARD - ${batTeam.toUpperCase()}`;
-  document.getElementById('bowlingScorecardHeader').innerText = `🎯 BOWLING ANALYSIS - ${bowlTeam.toUpperCase()}`;
+  document.getElementById('battingScorecardHeader').innerText = `BATTING SCORECARD - ${batTeam.toUpperCase()}`;
+  document.getElementById('bowlingScorecardHeader').innerText = `BOWLING ANALYSIS - ${bowlTeam.toUpperCase()}`;
 }
 
 function createTallyGrid() {
@@ -2513,7 +2633,7 @@ function saveSnapshot() {
 
 function recordBall(runs, ballType) {
   if (matchFinished) {
-    alert("Match is marked finished! Click '🔓 Resume / Edit' in the banner to continue scoring, or 'New Match' to start a new match.");
+    alert("Match is marked finished! Click 'Resume / Edit' in the banner to continue scoring, or 'New Match' to start a new match.");
     return;
   }
 
@@ -2637,7 +2757,7 @@ function checkOverCompletion(bowler, ballType) {
     // Alert over complete & prompt next bowler
     const maxLegalBalls = maxOvers * 6;
     if (legalBalls < maxLegalBalls && totalWickets < 10) {
-      showMatchAlert(`🔔 Over ${overNum} of ${maxOvers} Complete (6 balls bowled)! Bowler change required & strike ends swapped.`, "Next Bowler", () => {
+      showMatchAlert(`Over ${overNum} of ${maxOvers} Complete (6 balls bowled). Bowler change required & strike ends swapped.`, "Next Bowler", () => {
         document.getElementById('bowlerSelect').focus();
       });
     }
@@ -2669,7 +2789,7 @@ function checkInningsAndMatchStatus(maxLegalBalls) {
     if (legalBalls >= maxLegalBalls || totalWickets >= 10) {
       const reason = totalWickets >= 10 ? 'All Out' : `All ${maxOvers} Overs Complete (${maxLegalBalls} balls)`;
       const target = totalRuns + 1;
-      showMatchAlert(`🏆 1st Innings Complete (${reason})! ${batTeam}: ${totalRuns}/${totalWickets}. Target for ${bowlTeam}: ${target} runs in ${maxOvers} overs.`, "👉 Start 2nd Innings", () => {
+      showMatchAlert(`1st Innings Complete (${reason})! ${batTeam}: ${totalRuns}/${totalWickets}. Target for ${bowlTeam}: ${target} runs in ${maxOvers} overs.`, "Start 2nd Innings", () => {
         handleSwitchInnings();
       });
     }
@@ -2679,19 +2799,19 @@ function checkInningsAndMatchStatus(maxLegalBalls) {
       matchFinished = true;
       const wktMargin = 10 - totalWickets;
       const oversStr = `${Math.floor(legalBalls / 6)}.${legalBalls % 6}`;
-      matchResultText = `🎉 ${batTeam} won by ${wktMargin} wicket${wktMargin > 1 ? 's' : ''}!`;
-      showMatchAlert(`🏆 ${matchResultText} (Chased target ${targetScore} in ${oversStr} overs)`, "View Scorecard", () => {
+      matchResultText = `${batTeam} won by ${wktMargin} wicket${wktMargin > 1 ? 's' : ''}!`;
+      showMatchAlert(`${matchResultText} (Chased target ${targetScore} in ${oversStr} overs)`, "View Scorecard", () => {
         window.scrollTo({ top: 400, behavior: 'smooth' });
       }, 'alert-success', true);
     } else if (legalBalls >= maxLegalBalls || totalWickets >= 10) {
       matchFinished = true;
       if (targetScore !== null && totalRuns === targetScore - 1) {
-        matchResultText = `🤝 Match Tied! Both teams scored ${totalRuns} runs.`;
+        matchResultText = `Match Tied! Both teams scored ${totalRuns} runs.`;
         showMatchAlert(matchResultText, "View Scorecard", null, 'alert-success', true);
       } else {
         const runMargin = targetScore ? (targetScore - 1 - totalRuns) : 0;
-        matchResultText = `🎉 ${bowlTeam} won by ${runMargin} run${runMargin > 1 ? 's' : ''}!`;
-        showMatchAlert(`🏆 ${matchResultText} (${batTeam}: ${totalRuns}/${totalWickets} in ${maxOvers} ov)`, "View Scorecard", null, 'alert-success', true);
+        matchResultText = `${bowlTeam} won by ${runMargin} run${runMargin > 1 ? 's' : ''}!`;
+        showMatchAlert(`${matchResultText} (${batTeam}: ${totalRuns}/${totalWickets} in ${maxOvers} ov)`, "View Scorecard", null, 'alert-success', true);
       }
     }
   }
@@ -2741,7 +2861,7 @@ function unlockMatch() {
 // ==========================================
 function openWicketModal() {
   if (matchFinished) {
-    alert("Match is already finished! Click '🔓 Resume / Edit' in the banner to unlock.");
+    alert("Match is already finished! Click 'Resume / Edit' in the banner to unlock.");
     return;
   }
 
@@ -2951,7 +3071,7 @@ function handleSwitchInnings() {
     updateUI();
     saveState();
 
-    showMatchAlert(`🏏 2nd Innings Started! ${bowlTeam} needs ${target} runs in ${maxOvers} overs (${maxOvers * 6} balls) to win.`, null, null);
+    showMatchAlert(`2nd Innings Started! ${bowlTeam} needs ${target} runs in ${maxOvers} overs (${maxOvers * 6} balls) to win.`, null, null);
   } else {
     alert(`Match is already in 2nd Innings.\nTarget: ${targetScore} runs.\nTo start a completely fresh match between any teams, click 'New Match'.`);
   }
@@ -3020,7 +3140,7 @@ function confirmResetMatch() {
     updateUI();
     saveState();
 
-    alert("✅ New Match started! Scores are reset to 0/0.");
+    alert("New Match started! Scores are reset to 0/0.");
   }
 }
 
@@ -3112,7 +3232,7 @@ function updateUI() {
     overCont.innerHTML = `
       <span style="font-size:12px; font-weight:800; color:#064e3b; margin-right:4px;">Over ${lastCompletedOverNum} (Completed - 6 Balls):</span>
       ${lastCompletedOverBalls.map(b => renderBallBadgeHtml(b)).join('')}
-      <span class="strike-tag tag-striker" style="margin-left:8px;">🔔 Over Complete</span>
+      <span class="strike-tag tag-striker" style="margin-left:8px;">Over Complete</span>
     `;
   } else if (currentOverBalls.length > 0) {
     overCont.innerHTML = currentOverBalls.map(b => renderBallBadgeHtml(b)).join('');
@@ -3226,7 +3346,7 @@ function renderTablesForCurrentView() {
       <td>
         <input type="text" class="player-input" value="${b.name}" 
                ${(isViewingArchived1 || isViewerMode) ? 'readonly' : `onchange="updateBowlerName(${idx}, this.value)"`}>
-        ${isCurBowl ? '<span class="strike-tag tag-bowling">Bowling 🎯</span>' : ''}
+        ${isCurBowl ? '<span class="strike-tag tag-bowling">Bowling</span>' : ''}
       </td>
       <td class="text-center"><b>${o}</b></td>
       <td class="text-center">${b.maidens}</td>
