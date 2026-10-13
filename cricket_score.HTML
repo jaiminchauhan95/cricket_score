@@ -162,6 +162,126 @@
     .btn-reset { background: rgba(255, 255, 255, 0.18); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.3); }
     .btn-reset:hover { background: rgba(239, 68, 68, 0.9); }
 
+    .btn-hub { background: #0284c7; color: #ffffff; }
+    .btn-hub:hover { background: #0369a1; }
+
+    .match-badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(255, 255, 255, 0.22);
+      border: 1px solid rgba(255, 255, 255, 0.38);
+      color: #ffffff;
+      padding: 3px 10px;
+      border-radius: 14px;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      margin-top: 3px;
+      transition: all 0.2s;
+    }
+    .match-badge-pill:hover {
+      background: rgba(255, 255, 255, 0.35);
+      transform: translateY(-1px);
+    }
+
+    /* MATCHES HUB MODAL STYLES */
+    .matches-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 55vh;
+      overflow-y: auto;
+      padding: 4px;
+    }
+
+    .match-hub-card {
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 12px 14px;
+      background: #ffffff;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .match-hub-card:hover {
+      border-color: #0284c7;
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.08);
+    }
+
+    .match-hub-card.active-match {
+      border-color: #10b981;
+      background: #f0fdf4;
+    }
+
+    .match-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .match-code-badge {
+      background: #e0f2fe;
+      color: #0369a1;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 6px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .match-card-teams {
+      font-size: 15px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .match-card-score {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .match-card-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 4px;
+      flex-wrap: wrap;
+    }
+
+    .btn-match-action {
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-match-watch { background: #3b82f6; color: #ffffff; }
+    .btn-match-watch:hover { background: #2563eb; }
+
+    .btn-match-score { background: #10b981; color: #ffffff; }
+    .btn-match-score:hover { background: #059669; }
+
+    .btn-match-delete { background: #fee2e2; color: #b91c1c; }
+    .btn-match-delete:hover { background: #fca5a5; }
+
     /* MATCH ALERT BANNER */
     .match-alert-banner {
       background: #fef3c7;
@@ -1208,13 +1328,21 @@
     <div class="brand-title">
       <div class="brand-icon">🏏</div>
       <div>
-        <h1 id="appHeaderTitle">Cricket Live Scorer</h1>
+        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+          <h1 id="appHeaderTitle">Cricket Live Scorer</h1>
+          <div id="activeMatchBadge" class="match-badge-pill" onclick="openMatchesHubModal()" title="Click to view all matches or switch">
+            🏆 <span id="activeMatchIdDisplay">Match: M1</span>
+          </div>
+        </div>
         <div id="modeStatusBadge" class="mode-badge-indicator" style="display:none;">
           <span class="live-dot"></span> 🔴 LIVE SPECTATOR VIEW (READ ONLY)
         </div>
       </div>
     </div>
     <div class="header-actions">
+      <button class="btn-header btn-hub" onclick="openMatchesHubModal()" title="View All Live Matches & Switch Ground">
+        🏆 Matches Hub
+      </button>
       <button class="btn-header btn-print" onclick="handlePrint()" title="Print Complete Match Scorecard (Both Teams)">
         🖨️ Print (PDF)
       </button>
@@ -1230,8 +1358,8 @@
       <button class="btn-header btn-innings" id="inningsHeaderBtn" onclick="handleSwitchInnings()" title="Switch Innings (Team A / Team B)">
         ⇄ Switch Innings
       </button>
-      <button class="btn-header btn-reset" id="newMatchHeaderBtn" onclick="confirmResetMatch()" title="Start a Fresh New Match">
-        🔄 New Match
+      <button class="btn-header btn-reset" id="newMatchHeaderBtn" onclick="confirmResetMatch()" title="Reset current match scorecard">
+        🔄 Reset Score
       </button>
     </div>
   </header>
@@ -1673,12 +1801,93 @@
   </div>
 </div>
 
+<!-- MATCHES HUB MODAL -->
+<div class="modal-overlay" id="matchesHubModal">
+  <div class="modal-card" style="max-width: 580px;">
+    <div class="modal-header" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);">
+      <span style="display:flex; align-items:center; gap:8px;">
+        <span>🏆</span> <span>Live Matches &amp; Tournament Hub</span>
+      </span>
+      <span style="cursor: pointer; font-size: 24px; line-height: 1;" onclick="closeMatchesHubModal()">&times;</span>
+    </div>
+    <div class="modal-body" style="padding: 16px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <span style="font-size: 13px; font-weight: 700; color: #475569;" id="hubMatchesCountText">Active Matches</span>
+        <button class="btn-modal btn-modal-confirm" style="background: #10b981; font-size: 12px; padding: 6px 14px;" onclick="openCreateMatchModal()">
+          ➕ Start New Match
+        </button>
+      </div>
+      <div class="matches-grid" id="matchesListContainer">
+        <div style="text-align: center; padding: 24px; color: #64748b;">
+          ⏳ Loading matches...
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer" style="justify-content: space-between;">
+      <span style="font-size: 11px; color: #64748b;">Simultaneous matches run independently without data collision</span>
+      <button class="btn-modal btn-modal-cancel" onclick="closeMatchesHubModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- CREATE NEW MATCH MODAL -->
+<div class="modal-overlay" id="createMatchModal">
+  <div class="modal-card" style="max-width: 480px;">
+    <div class="modal-header" style="background: linear-gradient(135deg, #065f46 0%, #047857 100%);">
+      <span style="display:flex; align-items:center; gap:8px;">
+        <span>➕</span> <span>Create &amp; Start New Match</span>
+      </span>
+      <span style="cursor: pointer; font-size: 24px; line-height: 1;" onclick="closeCreateMatchModal()">&times;</span>
+    </div>
+    <div class="modal-body" style="padding: 18px;">
+      <div class="input-field">
+        <label>Match Code / ID <span style="color:#0284c7; font-size:11px;">(Unique code for URL, e.g. M1, Ground2)</span></label>
+        <input type="text" id="newMatchCodeInput" placeholder="e.g. M1 or Sarsa-Anand" style="padding:8px 10px; border:1.5px solid #cbd5e1; border-radius:6px; font-weight:700;">
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <div class="input-field">
+          <label>Team A (Name)</label>
+          <input type="text" id="newTeamANameInput" value="Team A" placeholder="e.g. Sarsa" style="padding:8px 10px; border:1.5px solid #cbd5e1; border-radius:6px; font-weight:700;">
+        </div>
+        <div class="input-field">
+          <label>Team B (Name)</label>
+          <input type="text" id="newTeamBNameInput" value="Team B" placeholder="e.g. Anand" style="padding:8px 10px; border:1.5px solid #cbd5e1; border-radius:6px; font-weight:700;">
+        </div>
+      </div>
+      <div class="input-field" style="margin-top: 4px;">
+        <label>Total Overs per Innings</label>
+        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+          <input type="number" id="newMatchOversInput" value="20" min="1" max="100" style="width: 80px; padding:8px 10px; border:1.5px solid #cbd5e1; border-radius:6px; font-weight:700;">
+          <button type="button" class="preset-pill" onclick="document.getElementById('newMatchOversInput').value=5">5 Ov</button>
+          <button type="button" class="preset-pill" onclick="document.getElementById('newMatchOversInput').value=10">10 Ov</button>
+          <button type="button" class="preset-pill" onclick="document.getElementById('newMatchOversInput').value=20">20 Ov</button>
+          <button type="button" class="preset-pill" onclick="document.getElementById('newMatchOversInput').value=50">50 Ov</button>
+        </div>
+      </div>
+      <div class="input-field" style="margin-top: 4px;">
+        <label>Scorer Security PIN <span style="font-size:11px; color:#64748b;">(Protects scoring from spectators)</span></label>
+        <input type="text" id="newMatchPinInput" value="1234" maxlength="10" placeholder="e.g. 1234" style="padding:8px 10px; border:1.5px solid #cbd5e1; border-radius:6px; font-weight:700;">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-modal btn-modal-cancel" onclick="closeCreateMatchModal()">Cancel</button>
+      <button class="btn-modal btn-modal-confirm" style="background:#059669;" onclick="submitCreateNewMatch()">🚀 Start Scoring Match</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ==========================================
 // CORE STATE & DATA ENGINE
 // ==========================================
-const STORAGE_KEY = 'cricket_live_score_v5_state';
+// Multi-match identifiers
+let currentMatchId = 'm1';
+let currentScorerPin = '1234';
 const DEFAULT_SCORER_PIN = '1234';
+
+function getStorageKey() {
+  return 'cricket_live_score_match_' + currentMatchId;
+}
 
 // App Mode: 'scorer' (full edit rights) or 'viewer' (read-only spectator mode)
 let isViewerMode = false;
@@ -1763,41 +1972,262 @@ let innings2Record = null;
 let history = [];
 
 // ==========================================
+// MULTI-MATCH & TOURNAMENT HUB ENGINE
+// ==========================================
+function initMatchFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const m = params.get('match');
+  if (m && m.trim() !== '') {
+    currentMatchId = m.trim().toLowerCase().replace(/[^a-z0-9_\-]/g, '');
+  } else {
+    const savedLast = localStorage.getItem('cricket_last_active_match');
+    currentMatchId = (savedLast && savedLast !== '') ? savedLast : 'm1';
+  }
+  localStorage.setItem('cricket_last_active_match', currentMatchId);
+
+  if (params.get('view') === 'live' || params.get('mode') === 'viewer' || params.get('read') === '1') {
+    isViewerMode = true;
+  }
+
+  updateMatchHeaderBadge();
+}
+
+function updateMatchHeaderBadge() {
+  const badgeEl = document.getElementById('activeMatchIdDisplay');
+  if (badgeEl) {
+    badgeEl.innerText = `Match: ${currentMatchId.toUpperCase()}`;
+  }
+}
+
+function openMatchesHubModal() {
+  document.getElementById('matchesHubModal').style.display = 'flex';
+  fetchMatchesList();
+}
+
+function closeMatchesHubModal() {
+  document.getElementById('matchesHubModal').style.display = 'none';
+}
+
+function openCreateMatchModal() {
+  closeMatchesHubModal();
+  document.getElementById('createMatchModal').style.display = 'flex';
+  const nextId = 'm' + (Math.floor(Math.random() * 900) + 100);
+  document.getElementById('newMatchCodeInput').value = nextId;
+  document.getElementById('newTeamANameInput').value = 'Team A';
+  document.getElementById('newTeamBNameInput').value = 'Team B';
+  document.getElementById('newMatchOversInput').value = '20';
+  document.getElementById('newMatchPinInput').value = '1234';
+}
+
+function closeCreateMatchModal() {
+  document.getElementById('createMatchModal').style.display = 'none';
+}
+
+function submitCreateNewMatch() {
+  let code = document.getElementById('newMatchCodeInput').value.trim().toLowerCase().replace(/[^a-z0-9_\-]/g, '');
+  if (!code) {
+    alert("Please enter a valid Match Code / ID (e.g. M1, Ground2)");
+    return;
+  }
+  const tA = document.getElementById('newTeamANameInput').value.trim() || 'Team A';
+  const tB = document.getElementById('newTeamBNameInput').value.trim() || 'Team B';
+  const ov = parseInt(document.getElementById('newMatchOversInput').value, 10) || 20;
+  const pin = document.getElementById('newMatchPinInput').value.trim() || '1234';
+
+  currentMatchId = code;
+  currentScorerPin = pin;
+  localStorage.setItem('cricket_last_active_match', currentMatchId);
+
+  // Initialize fresh match state
+  teamAName = tA;
+  teamBName = tB;
+  batFirst = 'A';
+  maxOvers = ov;
+  currentInnings = 1;
+  viewingTab = 1;
+  targetScore = null;
+  matchFinished = false;
+  matchResultText = '';
+  totalRuns = 0;
+  totalWickets = 0;
+  legalBalls = 0;
+  extras = { wide: 0, noBall: 0, bye: 0, legBye: 0 };
+  currentOverBalls = [];
+  currentOverRunsConceded = 0;
+  lastCompletedOverBalls = [];
+  lastCompletedOverNum = 0;
+  isOverJustFinished = false;
+  fallOfWickets = [];
+  overSummaryList = [];
+  innings1Record = null;
+  innings2Record = null;
+
+  teamASquad = teamASquad.map((_, i) => `Player ${tA} ${i + 1}`);
+  teamBSquad = teamBSquad.map((_, i) => `Player ${tB} ${i + 1}`);
+  batsmen = createBatsmenFromSquad(teamASquad);
+  bowlers = createBowlersFromSquad(teamBSquad);
+  strikerId = 1;
+  nonStrikerId = 2;
+  bowlerId = 1;
+
+  isViewerMode = false;
+
+  document.getElementById('teamANameInput').value = teamAName;
+  document.getElementById('teamBNameInput').value = teamBName;
+  document.getElementById('batFirstSelect').value = 'A';
+  document.getElementById('maxOversInput').value = maxOvers;
+
+  applyScorerModeUI();
+  updateMatchHeaderBadge();
+  populateDropdowns();
+  updateUI();
+  saveState();
+
+  closeCreateMatchModal();
+
+  const newUrl = `${window.location.origin}${window.location.pathname}?match=${encodeURIComponent(currentMatchId)}`;
+  window.history.pushState({ match: currentMatchId }, '', newUrl);
+
+  alert(`🎉 Match [${currentMatchId.toUpperCase()}] Created Successfully!\n\n${teamAName} vs ${teamBName} (${maxOvers} Overs)\nScorer PIN: ${currentScorerPin}\n\nYou can now start live scoring!`);
+}
+
+function fetchMatchesList() {
+  const container = document.getElementById('matchesListContainer');
+  container.innerHTML = `<div style="text-align: center; padding: 24px; color: #64748b;">⏳ Loading all live matches...</div>`;
+
+  fetch('api.php?action=list', { cache: 'no-store' })
+    .then(res => res.json())
+    .then(data => {
+      if (data && data.status === 'success' && Array.isArray(data.matches)) {
+        renderMatchesList(data.matches);
+      } else {
+        container.innerHTML = `<div style="text-align:center; padding: 20px; color:#64748b;">No matches found. Click '+ Start New Match' to create one!</div>`;
+      }
+    })
+    .catch(() => {
+      container.innerHTML = `<div style="text-align:center; padding: 20px; color:#ef4444;">Failed to load matches list. Please check connection.</div>`;
+    });
+}
+
+function renderMatchesList(matches) {
+  const container = document.getElementById('matchesListContainer');
+  const countEl = document.getElementById('hubMatchesCountText');
+  if (countEl) countEl.innerText = `${matches.length} Matches Found`;
+
+  if (matches.length === 0) {
+    container.innerHTML = `
+      <div style="text-align: center; padding: 30px; color: #64748b; background:#f8fafc; border-radius:8px; border:1px dashed #cbd5e1;">
+        <div style="font-size:32px; margin-bottom:8px;">🏏</div>
+        <div style="font-weight:700; color:#334155; margin-bottom:4px;">No active matches yet</div>
+        <div style="font-size:12px; margin-bottom:12px;">Create your first match to start live scoring!</div>
+        <button class="btn-modal btn-modal-confirm" style="background: #10b981;" onclick="openCreateMatchModal()">
+          ➕ Start New Match
+        </button>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = matches.map(m => {
+    const isActive = (m.id === currentMatchId);
+    const updatedSecAgo = m.updatedAt ? Math.max(0, Math.floor((Date.now() / 1000) - m.updatedAt)) : 0;
+    let timeText = updatedSecAgo < 60 ? `${updatedSecAgo}s ago` : `${Math.floor(updatedSecAgo / 60)}m ago`;
+    const statusPill = m.matchFinished
+      ? `<span style="background:#fee2e2; color:#b91c1c; font-size:10px; font-weight:800; padding:2px 6px; border-radius:10px;">✅ FINISHED</span>`
+      : `<span style="background:#dcfce7; color:#15803d; font-size:10px; font-weight:800; padding:2px 6px; border-radius:10px;"><span class="live-dot" style="width:6px; height:6px;"></span> LIVE</span>`;
+
+    return `
+      <div class="match-hub-card ${isActive ? 'active-match' : ''}">
+        <div class="match-card-header">
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span class="match-code-badge">${m.id.toUpperCase()}</span>
+            ${statusPill}
+            ${isActive ? '<span style="font-size:11px; font-weight:800; color:#059669;">(Currently Open)</span>' : ''}
+          </div>
+          <span style="font-size:11px; color:#64748b;">🕒 ${timeText}</span>
+        </div>
+        <div class="match-card-teams">
+          🏏 ${m.teamAName} vs ${m.teamBName}
+        </div>
+        <div class="match-card-score">
+          <span>Score: <b>${m.totalRuns}/${m.totalWickets}</b> (${m.overs}/${m.maxOvers} Ov)</span>
+          ${m.matchResultText ? `<span style="font-size:11px; color:#64748b; font-weight:500;">• ${m.matchResultText}</span>` : ''}
+        </div>
+        <div class="match-card-actions">
+          <button class="btn-match-action btn-match-watch" onclick="switchToMatch('${m.id}', true)">
+            👁️ Watch Live
+          </button>
+          <button class="btn-match-action btn-match-score" onclick="switchToMatch('${m.id}', false, '${m.scorerPin || '1234'}')">
+            ✏️ Score Match
+          </button>
+          <button class="btn-match-action btn-match-delete" onclick="deleteMatchConfirm('${m.id}')" title="Delete Match">
+            🗑️
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function switchToMatch(matchId, asViewer, expectedPin) {
+  closeMatchesHubModal();
+  if (asViewer) {
+    window.location.href = `?match=${encodeURIComponent(matchId)}&view=live`;
+  } else {
+    const pin = prompt(`Enter Scorer PIN for Match [${matchId.toUpperCase()}]:\n(Default: 1234)`, "");
+    if (pin === expectedPin || pin === '1234' || pin === 'admin') {
+      window.location.href = `?match=${encodeURIComponent(matchId)}`;
+    } else if (pin !== null) {
+      alert("❌ Incorrect PIN for this match!");
+    }
+  }
+}
+
+function deleteMatchConfirm(matchId) {
+  if (confirm(`Are you sure you want to delete Match [${matchId.toUpperCase()}] from server? This cannot be undone.`)) {
+    fetch(`api.php?action=delete&match=${encodeURIComponent(matchId)}`, { method: 'POST' })
+      .then(res => res.json())
+      .then(() => {
+        if (currentMatchId === matchId) {
+          localStorage.removeItem('cricket_live_score_match_' + matchId);
+          currentMatchId = 'm1';
+          localStorage.setItem('cricket_last_active_match', 'm1');
+        }
+        fetchMatchesList();
+      })
+      .catch(() => {
+        alert("Failed to delete match. Please try again.");
+      });
+  }
+}
+
+// ==========================================
 // INITIALIZATION
 // ==========================================
 function init() {
-  checkUrlParamsForViewerMode();
+  initMatchFromUrl();
   loadSavedState();
   syncTeamSquadsAndRoles();
   createTallyGrid();
   populateDropdowns();
   updateUI();
 
-  // If in viewer mode, start periodic live sync from backend
   if (isViewerMode) {
     applyViewerModeUI();
     startViewerPolling();
-  }
-}
-
-function checkUrlParamsForViewerMode() {
-  const params = new URLSearchParams(window.location.search);
-  if (params.get('view') === 'live' || params.get('mode') === 'viewer' || params.get('read') === '1') {
-    isViewerMode = true;
+  } else {
+    fetchRemoteStateOnce();
   }
 }
 
 function toggleViewerMode() {
   if (!isViewerMode) {
-    // Switch to Viewer Mode
     isViewerMode = true;
     applyViewerModeUI();
     startViewerPolling();
     alert("👁️ Switched to Spectator (Viewer) Mode!\nScoring buttons are hidden and scores are read-only.");
   } else {
-    // Switch back to Scorer Mode with PIN check
-    const pin = prompt("Enter Scorer PIN to unlock scoring controls:\n(Default PIN: 1234)", "");
-    if (pin === DEFAULT_SCORER_PIN || pin === 'admin') {
+    const pin = prompt(`Enter Scorer PIN for Match [${currentMatchId.toUpperCase()}]:\n(Default PIN: 1234)`, "");
+    if (pin === currentScorerPin || pin === DEFAULT_SCORER_PIN || pin === 'admin') {
       isViewerMode = false;
       stopViewerPolling();
       applyScorerModeUI();
@@ -1816,13 +2246,11 @@ function applyViewerModeUI() {
   document.getElementById('inningsHeaderBtn').style.display = 'none';
   document.getElementById('newMatchHeaderBtn').style.display = 'none';
 
-  // Subtitles in scorecard
   const batSub = document.querySelector('#battingScorecardHeader + span');
   if (batSub) batSub.innerText = '(Live Player Scores)';
   const bowlSub = document.querySelector('#bowlingScorecardHeader + span');
   if (bowlSub) bowlSub.innerText = '(Live Bowling Figures)';
 
-  // Make setup inputs read-only in spectator view
   document.getElementById('teamANameInput').disabled = true;
   document.getElementById('teamBNameInput').disabled = true;
   document.getElementById('batFirstSelect').disabled = true;
@@ -1859,10 +2287,10 @@ function applyScorerModeUI() {
 }
 
 function shareLiveViewerLink() {
-  const viewerUrl = `${window.location.origin}${window.location.pathname}?view=live`;
+  const viewerUrl = `${window.location.origin}${window.location.pathname}?match=${encodeURIComponent(currentMatchId)}&view=live`;
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(viewerUrl).then(() => {
-      alert(`📋 Spectator Live Link Copied to Clipboard!\n\n${viewerUrl}\n\nShare this link on WhatsApp or with spectators. They will see the live score in read-only mode without being able to edit it!`);
+      alert(`📋 Spectator Live Link Copied to Clipboard!\n\nMatch: ${currentMatchId.toUpperCase()} (${teamAName} vs ${teamBName})\n${viewerUrl}\n\nShare this link on WhatsApp or with spectators. They will see the live score in read-only mode!`);
     }).catch(() => {
       prompt("Copy Spectator Live Link:", viewerUrl);
     });
@@ -1884,11 +2312,23 @@ function stopViewerPolling() {
 }
 
 function fetchLiveBackendData() {
-  fetch('api.php', { cache: 'no-store' })
+  fetch(`api.php?match=${encodeURIComponent(currentMatchId)}`, { cache: 'no-store' })
     .then(res => res.json())
     .then(data => {
       if (data && data.teamAName) {
         applyRemoteState(data);
+      }
+    })
+    .catch(() => {});
+}
+
+function fetchRemoteStateOnce() {
+  fetch(`api.php?match=${encodeURIComponent(currentMatchId)}`, { cache: 'no-store' })
+    .then(res => res.json())
+    .then(data => {
+      if (data && data.teamAName) {
+        applyRemoteState(data);
+        if (data.scorerPin) currentScorerPin = data.scorerPin;
       }
     })
     .catch(() => {});
@@ -2523,7 +2963,7 @@ function handleSwitchInnings() {
 function confirmResetMatch() {
   if (confirm("Are you sure you want to start a NEW MATCH?\n\nAll current scores, innings, target, and overs will be reset cleanly to 0.")) {
     try {
-      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(getStorageKey());
     } catch (e) {}
 
     currentInnings = 1;
@@ -2855,7 +3295,7 @@ function preparePrintReport() {
   const remBalls = legalBalls % 6;
   const curOversStr = `${completedOvers}.${remBalls}`;
 
-  document.getElementById('printMatchTeams').innerText = `${teamAName} vs ${teamBName}`;
+  document.getElementById('printMatchTeams').innerText = `[Match: ${currentMatchId.toUpperCase()}] ${teamAName} vs ${teamBName}`;
   document.getElementById('printMatchFormat').innerText = `${maxOvers} Overs (${maxOvers * 6} Balls per Innings)`;
   document.getElementById('printMatchDate').innerText = `${matchDate} ${matchTime}`;
   document.getElementById('printMatchStatus').innerText = matchResultText || (currentInnings === 2 ? `Target: ${targetScore} runs` : '1st Innings in progress');
@@ -3067,7 +3507,7 @@ function handleExcelExport() {
     XLSX.utils.book_append_sheet(wb, ws, "Match Scorecard");
     const safeBat = teamAName.replace(/[^a-zA-Z0-9_-]/g, '_');
     const safeBowl = teamBName.replace(/[^a-zA-Z0-9_-]/g, '_');
-    XLSX.writeFile(wb, `${safeBat}_vs_${safeBowl}_Complete_Report.xlsx`);
+    XLSX.writeFile(wb, `${currentMatchId.toUpperCase()}_${safeBat}_vs_${safeBowl}_Complete_Report.xlsx`);
   } else {
     alert("Excel library not loaded. Please use Print (PDF) to save match scorecard.");
   }
@@ -3079,6 +3519,8 @@ function handleExcelExport() {
 function saveState() {
   try {
     const state = {
+      matchId: currentMatchId,
+      scorerPin: currentScorerPin,
       currentInnings,
       viewingTab,
       targetScore,
@@ -3109,7 +3551,7 @@ function saveState() {
       innings1Record,
       innings2Record
     };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    localStorage.setItem(getStorageKey(), JSON.stringify(state));
 
     // Asynchronously sync state to server for spectators if in scorer mode
     if (!isViewerMode) {
@@ -3121,7 +3563,9 @@ function saveState() {
 }
 
 function syncStateToBackend(state) {
-  fetch('api.php', {
+  state.matchId = currentMatchId;
+  state.scorerPin = currentScorerPin;
+  fetch(`api.php?match=${encodeURIComponent(currentMatchId)}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(state)
@@ -3130,10 +3574,11 @@ function syncStateToBackend(state) {
 
 function loadSavedState() {
   try {
-    const saved = localStorage.getItem(STORAGE_KEY);
+    const saved = localStorage.getItem(getStorageKey());
     if (!saved) return;
     const state = JSON.parse(saved);
 
+    if (state.scorerPin) currentScorerPin = state.scorerPin;
     if (state.teamAName) teamAName = state.teamAName;
     if (state.teamBName) teamBName = state.teamBName;
     if (state.batFirst) batFirst = state.batFirst;
