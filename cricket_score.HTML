@@ -1759,7 +1759,7 @@
           <span>Team A (Name)</span>
           <span style="color:#10b981;">●</span>
         </div>
-        <input type="text" id="teamANameInput" value="Team A" oninput="onTeamSetupChange()" onchange="onTeamSetupChange()" placeholder="e.g. Sarsa">
+        <input type="text" id="teamANameInput" value="Team A" oninput="onTeamSetupChange()" onchange="onTeamSetupChange()" onkeyup="updateTossDropdown()" placeholder="e.g. Sarsa">
       </div>
 
       <!-- Team B Name -->
@@ -1768,13 +1768,13 @@
           <span>Team B (Name)</span>
           <span style="color:#0284c7;">●</span>
         </div>
-        <input type="text" id="teamBNameInput" value="Team B" oninput="onTeamSetupChange()" onchange="onTeamSetupChange()" placeholder="e.g. Khambholaj">
+        <input type="text" id="teamBNameInput" value="Team B" oninput="onTeamSetupChange()" onchange="onTeamSetupChange()" onkeyup="updateTossDropdown()" placeholder="e.g. Khambholaj">
       </div>
 
       <!-- Toss / Batting First -->
       <div class="setup-card">
         <div class="setup-card-label">Toss / Batting 1st</div>
-        <select id="batFirstSelect" onchange="onTeamSetupChange()">
+        <select id="batFirstSelect" onchange="onTeamSetupChange()" onfocus="updateTossDropdown()">
           <option value="A">Team A Bats 1st (Team B Bowls)</option>
           <option value="B">Team B Bats 1st (Team A Bowls)</option>
         </select>
@@ -2578,6 +2578,7 @@ function deleteMatchConfirm(matchId) {
 function init() {
   initMatchFromUrl();
   loadSavedState();
+  updateTossDropdown();
   syncTeamSquadsAndRoles();
   createTallyGrid();
   populateDropdowns();
@@ -2736,6 +2737,11 @@ function applyRemoteState(state) {
   if (state.innings1Record) innings1Record = state.innings1Record;
   if (state.innings2Record) innings2Record = state.innings2Record;
 
+  const tAInput = document.getElementById('teamANameInput');
+  if (tAInput && document.activeElement !== tAInput) tAInput.value = teamAName;
+  const tBInput = document.getElementById('teamBNameInput');
+  if (tBInput && document.activeElement !== tBInput) tBInput.value = teamBName;
+  updateTossDropdown();
   syncTeamSquadsAndRoles();
   populateDropdowns();
   updateUI();
@@ -2750,28 +2756,97 @@ function setQuickOvers(ov) {
   onTeamSetupChange();
 }
 
+function updateTossDropdown() {
+  const batFirstSel = document.getElementById('batFirstSelect');
+  if (!batFirstSel) return;
+
+  const tA = (document.getElementById('teamANameInput')?.value || teamAName || 'Team A').trim() || 'Team A';
+  const tB = (document.getElementById('teamBNameInput')?.value || teamBName || 'Team B').trim() || 'Team B';
+  const currentVal = batFirst || batFirstSel.value || 'A';
+
+  const optAText = `${tA} Bats 1st (${tB} Bowls)`;
+  const optBText = `${tB} Bats 1st (${tA} Bowls)`;
+
+  if (batFirstSel.options.length >= 2) {
+    if (batFirstSel.options[0].text !== optAText) batFirstSel.options[0].text = optAText;
+    if (batFirstSel.options[1].text !== optBText) batFirstSel.options[1].text = optBText;
+    batFirstSel.options[0].value = 'A';
+    batFirstSel.options[1].value = 'B';
+  } else {
+    batFirstSel.innerHTML = `
+      <option value="A">${optAText}</option>
+      <option value="B">${optBText}</option>
+    `;
+  }
+
+  batFirstSel.value = currentVal;
+
+  const isMatchStarted = (legalBalls > 0 || totalRuns > 0 || totalWickets > 0 || currentInnings > 1);
+  batFirstSel.disabled = isMatchStarted;
+  if (isMatchStarted) {
+    batFirstSel.title = "Toss locked once match begins. Click 'Reset Score' to change toss.";
+  } else {
+    batFirstSel.title = "Select which team bats 1st";
+  }
+}
+
 function onTeamSetupChange() {
+  const prevTeamA = teamAName;
+  const prevTeamB = teamBName;
+  const prevBatFirst = batFirst;
+
   teamAName = document.getElementById('teamANameInput').value.trim() || 'Team A';
   teamBName = document.getElementById('teamBNameInput').value.trim() || 'Team B';
   batFirst = document.getElementById('batFirstSelect').value;
   maxOvers = Math.max(1, parseInt(document.getElementById('maxOversInput').value) || 20);
   document.getElementById('maxOversInput').value = maxOvers;
 
-  // Update Toss dropdown options text dynamically
-  const batFirstSel = document.getElementById('batFirstSelect');
-  const selVal = batFirstSel.value;
-  batFirstSel.innerHTML = `
-    <option value="A" ${selVal === 'A' ? 'selected' : ''}>${teamAName} Bats 1st (${teamBName} Bowls)</option>
-    <option value="B" ${selVal === 'B' ? 'selected' : ''}>${teamBName} Bats 1st (${teamAName} Bowls)</option>
-  `;
+  // 1. Update Toss dropdown options text dynamically
+  updateTossDropdown();
 
-  // Update pills active status
+  // 2. If match has not started yet, automatically keep squad names & batting/bowling assignment aligned
+  const isMatchStarted = (legalBalls > 0 || totalRuns > 0 || totalWickets > 0 || currentInnings > 1);
+  if (!isMatchStarted) {
+    // If teamAName changed, rename default Team A player names
+    if (prevTeamA !== teamAName) {
+      teamASquad = teamASquad.map((name, i) => {
+        if (!name || name.startsWith('Player Team A') || name.startsWith('Player A') || (prevTeamA && name.startsWith(`Player ${prevTeamA}`))) {
+          return `Player ${teamAName} ${i + 1}`;
+        }
+        return name;
+      });
+    }
+
+    // If teamBName changed, rename default Team B player names
+    if (prevTeamB !== teamBName) {
+      teamBSquad = teamBSquad.map((name, i) => {
+        if (!name || name.startsWith('Player Team B') || name.startsWith('Player B') || (prevTeamB && name.startsWith(`Player ${prevTeamB}`))) {
+          return `Player ${teamBName} ${i + 1}`;
+        }
+        return name;
+      });
+    }
+
+    // When Toss or Team Names change before balls bowled, assign correct squad to 1st innings batting/bowling
+    if (currentInnings === 1) {
+      const batSquad = (batFirst === 'A') ? teamASquad : teamBSquad;
+      const bowlSquad = (batFirst === 'A') ? teamBSquad : teamASquad;
+
+      batsmen = createBatsmenFromSquad(batSquad);
+      bowlers = createBowlersFromSquad(bowlSquad);
+      strikerId = 1;
+      nonStrikerId = 2;
+      bowlerId = 1;
+    }
+  }
+
+  // 3. Update pills active status
   const pills = document.querySelectorAll('.preset-pill');
   pills.forEach(p => {
     p.classList.toggle('active', parseInt(p.innerText) === maxOvers);
   });
 
-  // Update total balls note
+  // 4. Update total balls note
   const totalBalls = maxOvers * 6;
   document.getElementById('oversCalcNote').innerText = `${maxOvers} Overs = ${totalBalls} Legal Balls (6 balls/over)`;
 
@@ -3410,6 +3485,7 @@ function switchViewTab(tabNum) {
 // UI UPDATE
 // ==========================================
 function updateUI() {
+  updateTossDropdown();
   const batTeam = getActiveBattingTeamName();
   const bowlTeam = getActiveBowlingTeamName();
   const maxLegalBalls = maxOvers * 6;
@@ -3960,7 +4036,7 @@ function loadSavedState() {
 
     document.getElementById('teamANameInput').value = teamAName;
     document.getElementById('teamBNameInput').value = teamBName;
-    document.getElementById('batFirstSelect').value = batFirst;
+    updateTossDropdown();
     document.getElementById('maxOversInput').value = maxOvers;
 
     if (state.currentInnings !== undefined) currentInnings = state.currentInnings;
