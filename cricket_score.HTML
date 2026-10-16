@@ -476,6 +476,19 @@
       margin-bottom: 14px;
     }
 
+    @media (min-width: 960px) {
+      .teams-setup-grid {
+        grid-template-columns: 1fr 1fr 1.35fr 1.15fr;
+      }
+    }
+
+    #batFirstSelect {
+      font-size: 13.5px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
     .setup-card {
       background: #142238;
       border: 1.5px solid #243754;
@@ -2330,6 +2343,8 @@ let currentOverRunsConceded = 0;
 let lastCompletedOverBalls = [];
 let lastCompletedOverNum = 0;
 let isOverJustFinished = false;
+let lastCompletedOverBowlerId = null;
+let currentTallyLimit = 100;
 
 let fallOfWickets = [];
 let overSummaryList = []; // Array of completed overs: { overNum, runs, wickets, bowlerName }
@@ -2725,6 +2740,7 @@ function applyRemoteState(state) {
   if (state.lastCompletedOverBalls) lastCompletedOverBalls = state.lastCompletedOverBalls;
   if (state.lastCompletedOverNum !== undefined) lastCompletedOverNum = state.lastCompletedOverNum;
   if (state.isOverJustFinished !== undefined) isOverJustFinished = state.isOverJustFinished;
+  if (state.lastCompletedOverBowlerId !== undefined) lastCompletedOverBowlerId = state.lastCompletedOverBowlerId;
   if (state.fallOfWickets) fallOfWickets = state.fallOfWickets;
   if (state.overSummaryList) overSummaryList = state.overSummaryList;
 
@@ -2741,6 +2757,14 @@ function applyRemoteState(state) {
   if (tAInput && document.activeElement !== tAInput) tAInput.value = teamAName;
   const tBInput = document.getElementById('teamBNameInput');
   if (tBInput && document.activeElement !== tBInput) tBInput.value = teamBName;
+  const ovInput = document.getElementById('maxOversInput');
+  if (ovInput && document.activeElement !== ovInput) ovInput.value = maxOvers;
+  const noteEl = document.getElementById('oversCalcNote');
+  if (noteEl) noteEl.innerText = `${maxOvers} Overs = ${maxOvers * 6} Legal Balls (6 balls/over)`;
+  const pills = document.querySelectorAll('.preset-pill');
+  pills.forEach(p => {
+    p.classList.toggle('active', parseInt(p.innerText) === maxOvers);
+  });
   updateTossDropdown();
   syncTeamSquadsAndRoles();
   populateDropdowns();
@@ -2889,15 +2913,17 @@ function syncTeamSquadsAndRoles() {
 
 function createTallyGrid() {
   const grid = document.getElementById('tallyGrid');
+  if (!grid) return;
   grid.innerHTML = '';
   const baseLimit = Math.max(100, maxOvers * 7);
-  const maxLimit = Math.max(baseLimit, Math.ceil((totalRuns + 20) / 20) * 20);
+  const maxLimit = Math.max(baseLimit, Math.ceil((totalRuns + 30) / 20) * 20);
+  currentTallyLimit = maxLimit;
   
   document.getElementById('tallyRangeText').innerText = `1 to ${maxLimit} Tracker`;
 
   for (let i = 1; i <= maxLimit; i++) {
     const box = document.createElement('div');
-    box.className = 'tally-cell';
+    box.className = 'tally-cell' + (i <= totalRuns ? ' ticked' : '');
     box.id = `tally-${i}`;
     box.innerText = i;
     grid.appendChild(box);
@@ -2909,9 +2935,12 @@ function populateDropdowns() {
   const nonStrikerSel = document.getElementById('nonStrikerSelect');
   const bowlerSel = document.getElementById('bowlerSelect');
 
-  strikerSel.innerHTML = batsmen.map(b => `<option value="${b.id}" ${b.id === strikerId ? 'selected' : ''}>${b.name}</option>`).join('');
-  nonStrikerSel.innerHTML = batsmen.map(b => `<option value="${b.id}" ${b.id === nonStrikerId ? 'selected' : ''}>${b.name}</option>`).join('');
-  bowlerSel.innerHTML = bowlers.map(b => `<option value="${b.id}" ${b.id === bowlerId ? 'selected' : ''}>${b.name}</option>`).join('');
+  strikerSel.innerHTML = batsmen.map(b => `<option value="${b.id}" ${b.id === strikerId ? 'selected' : ''}>${b.name} (${b.runs}r, ${b.balls}b)</option>`).join('');
+  nonStrikerSel.innerHTML = batsmen.map(b => `<option value="${b.id}" ${b.id === nonStrikerId ? 'selected' : ''}>${b.name} (${b.runs}r, ${b.balls}b)</option>`).join('');
+  bowlerSel.innerHTML = bowlers.map(b => {
+    const oStr = `${Math.floor(b.ballsDelivered / 6)}.${b.ballsDelivered % 6}`;
+    return `<option value="${b.id}" ${b.id === bowlerId ? 'selected' : ''}>${b.name} (${oStr} ov, ${b.wickets}-${b.runs})</option>`;
+  }).join('');
 }
 
 function onPlayerSelectChange() {
@@ -2948,6 +2977,7 @@ function saveSnapshot() {
     lastCompletedOverBalls: [...lastCompletedOverBalls],
     lastCompletedOverNum,
     isOverJustFinished,
+    lastCompletedOverBowlerId,
     fallOfWickets: [...fallOfWickets],
     overSummaryList: JSON.parse(JSON.stringify(overSummaryList)),
     strikerId,
@@ -2981,14 +3011,23 @@ function recordBall(runs, ballType) {
     return;
   }
 
-  saveSnapshot();
-
-  // If previous ball finished an over, reset active over stream for the new over now
+  // If previous ball finished an over, verify bowler change rule & reset active over stream
   if (isOverJustFinished) {
+    if (lastCompletedOverBowlerId !== null && bowlerId === lastCompletedOverBowlerId) {
+      const bObj = bowlers.find(b => b.id === bowlerId);
+      const bName = bObj ? bObj.name : 'Current Bowler';
+      const proceed = confirm(`⚠️ Consecutive Over Rule:\n${bName} bowled the previous over (Over ${lastCompletedOverNum}).\nIn standard cricket rules, a bowler cannot bowl two consecutive overs.\n\nClick 'Cancel' to choose a different bowler from the dropdown, or 'OK' to proceed anyway.`);
+      if (!proceed) {
+        document.getElementById('bowlerSelect').focus();
+        return;
+      }
+    }
     isOverJustFinished = false;
     currentOverBalls = [];
     currentOverRunsConceded = 0;
   }
+
+  saveSnapshot();
 
   const striker = batsmen.find(b => b.id === strikerId);
   const bowler = bowlers.find(b => b.id === bowlerId);
@@ -3077,6 +3116,7 @@ function checkOverCompletion(bowler, ballType) {
     lastCompletedOverBalls = [...currentOverBalls];
     lastCompletedOverNum = overNum;
     isOverJustFinished = true;
+    lastCompletedOverBowlerId = bowler ? bowler.id : bowlerId;
 
     // Strike swaps at the end of the over
     swapStrikeInternal();
@@ -3309,6 +3349,7 @@ function undoLastBall() {
   lastCompletedOverBalls = prev.lastCompletedOverBalls || [];
   lastCompletedOverNum = prev.lastCompletedOverNum || 0;
   isOverJustFinished = prev.isOverJustFinished || false;
+  lastCompletedOverBowlerId = prev.lastCompletedOverBowlerId !== undefined ? prev.lastCompletedOverBowlerId : null;
   fallOfWickets = prev.fallOfWickets || [];
   overSummaryList = prev.overSummaryList || [];
   strikerId = prev.strikerId;
@@ -3385,6 +3426,7 @@ function handleSwitchInnings() {
     lastCompletedOverBalls = [];
     lastCompletedOverNum = 0;
     isOverJustFinished = false;
+    lastCompletedOverBowlerId = null;
     fallOfWickets = [];
     overSummaryList = [];
 
@@ -3453,6 +3495,7 @@ function confirmResetMatch() {
     lastCompletedOverBalls = [];
     lastCompletedOverNum = 0;
     isOverJustFinished = false;
+    lastCompletedOverBowlerId = null;
     fallOfWickets = [];
     overSummaryList = [];
 
@@ -3989,6 +4032,7 @@ function saveState() {
       lastCompletedOverBalls,
       lastCompletedOverNum,
       isOverJustFinished,
+      lastCompletedOverBowlerId,
       fallOfWickets,
       overSummaryList,
       strikerId,
@@ -4038,6 +4082,12 @@ function loadSavedState() {
     document.getElementById('teamBNameInput').value = teamBName;
     updateTossDropdown();
     document.getElementById('maxOversInput').value = maxOvers;
+    const noteEl = document.getElementById('oversCalcNote');
+    if (noteEl) noteEl.innerText = `${maxOvers} Overs = ${maxOvers * 6} Legal Balls (6 balls/over)`;
+    const pills = document.querySelectorAll('.preset-pill');
+    pills.forEach(p => {
+      p.classList.toggle('active', parseInt(p.innerText) === maxOvers);
+    });
 
     if (state.currentInnings !== undefined) currentInnings = state.currentInnings;
     if (state.viewingTab !== undefined) viewingTab = state.viewingTab;
@@ -4054,6 +4104,7 @@ function loadSavedState() {
     if (state.lastCompletedOverBalls) lastCompletedOverBalls = state.lastCompletedOverBalls;
     if (state.lastCompletedOverNum !== undefined) lastCompletedOverNum = state.lastCompletedOverNum;
     if (state.isOverJustFinished !== undefined) isOverJustFinished = state.isOverJustFinished;
+    if (state.lastCompletedOverBowlerId !== undefined) lastCompletedOverBowlerId = state.lastCompletedOverBowlerId;
     if (state.fallOfWickets) fallOfWickets = state.fallOfWickets;
     if (state.overSummaryList) overSummaryList = state.overSummaryList;
 
