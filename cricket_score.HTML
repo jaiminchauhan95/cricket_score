@@ -876,6 +876,82 @@
       transform: translateY(-1px);
     }
 
+    .extras-modal-btn {
+      background: rgba(168, 85, 247, 0.16);
+      color: #c084fc;
+      border: 1.5px solid #a855f7;
+      padding: 6px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 12.5px;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      letter-spacing: 0.3px;
+    }
+
+    .extras-modal-btn:hover {
+      background: #9333ea;
+      color: #ffffff;
+      box-shadow: 0 0 14px rgba(168, 85, 247, 0.5);
+      transform: translateY(-1px);
+    }
+
+    .extras-quick-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      background: rgba(13, 22, 36, 0.7);
+      border: 1px dashed #223754;
+      border-radius: 6px;
+      padding: 8px 12px;
+      margin-top: 6px;
+      margin-bottom: 12px;
+    }
+
+    .extras-quick-title {
+      font-size: 11px;
+      font-weight: 800;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-right: 4px;
+    }
+
+    .extra-pill-btn {
+      background: #162438;
+      color: #cbd5e1;
+      border: 1px solid #2a3f60;
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 11.5px;
+      font-weight: 800;
+      cursor: pointer;
+      font-family: 'JetBrains Mono', monospace;
+      transition: all 0.15s ease;
+    }
+
+    .extra-pill-btn:hover {
+      background: #233754;
+      color: #ffffff;
+      border-color: #38bdf8;
+      transform: translateY(-1px);
+    }
+
+    .extra-pill-more {
+      background: rgba(168, 85, 247, 0.2);
+      color: #e9d5ff;
+      border-color: #a855f7;
+    }
+
+    .extra-pill-more:hover {
+      background: #9333ea;
+      color: #ffffff;
+    }
+
     .keypad-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(66px, 1fr));
@@ -1917,6 +1993,9 @@
         <button class="strike-swap-btn" onclick="manualSwapStrike()" title="Swap Strike Between Batsmen">
           Swap Strike
         </button>
+        <button class="extras-modal-btn" onclick="openExtrasModal()" title="Record Custom Extras or Multi-Runs">
+          + Custom Extras
+        </button>
       </div>
     </div>
 
@@ -1945,19 +2024,19 @@
         6
         <span class="sub-label">Six</span>
       </button>
-      <button class="key-btn key-wide" onclick="recordBall(1, 'wide')">
+      <button class="key-btn key-wide" onclick="recordBall(1, 'wide')" title="Standard 1 Wide">
         WD
         <span class="sub-label">Wide</span>
       </button>
-      <button class="key-btn key-noball" onclick="recordBall(1, 'noball')">
+      <button class="key-btn key-noball" onclick="recordBall(0, 'noball')" title="Standard 1 No Ball (0 off bat)">
         NB
         <span class="sub-label">No Ball</span>
       </button>
-      <button class="key-btn key-bye" onclick="recordBall(1, 'bye')">
+      <button class="key-btn key-bye" onclick="recordBall(1, 'bye')" title="1 Bye">
         1B
         <span class="sub-label">Bye</span>
       </button>
-      <button class="key-btn key-bye" onclick="recordBall(1, 'legbye')">
+      <button class="key-btn key-bye" onclick="recordBall(1, 'legbye')" title="1 Leg Bye">
         1LB
         <span class="sub-label">Leg Bye</span>
       </button>
@@ -1969,6 +2048,22 @@
         UNDO
         <span class="sub-label">Revert</span>
       </button>
+    </div>
+
+    <!-- QUICK EXTRAS SUB-ROW (FOR FAST SCORING OF COMMON MULTI-RUN EXTRAS) -->
+    <div class="extras-quick-row">
+      <span class="extras-quick-title">Quick Extras:</span>
+      <button class="extra-pill-btn" onclick="recordBall(2, 'wide', 1)" title="Wide + 1 run (2 wides total)">WD+1</button>
+      <button class="extra-pill-btn" onclick="recordBall(5, 'wide', 0)" title="Wide + 4 boundary (5 wides)">5WD (Boundary)</button>
+      <button class="extra-pill-btn" onclick="recordBall(1, 'noball')" title="No Ball + 1 run off bat (2 runs total)">NB+1</button>
+      <button class="extra-pill-btn" onclick="recordBall(2, 'noball')" title="No Ball + 2 runs off bat (3 runs total)">NB+2</button>
+      <button class="extra-pill-btn" onclick="recordBall(4, 'noball')" title="No Ball + Four boundary (5 runs total)">NB+4</button>
+      <button class="extra-pill-btn" onclick="recordBall(6, 'noball')" title="No Ball + Six (7 runs total)">NB+6</button>
+      <button class="extra-pill-btn" onclick="recordBall(2, 'bye')" title="2 Byes">2B</button>
+      <button class="extra-pill-btn" onclick="recordBall(4, 'bye')" title="4 Byes">4B</button>
+      <button class="extra-pill-btn" onclick="recordBall(2, 'legbye')" title="2 Leg Byes">2LB</button>
+      <button class="extra-pill-btn" onclick="recordBall(4, 'legbye')" title="4 Leg Byes">4LB</button>
+      <button class="extra-pill-btn extra-pill-more" onclick="openExtrasModal()" title="Custom Extra Selector">+ More...</button>
     </div>
   </div>
 
@@ -2164,13 +2259,21 @@
       </div>
       <div class="input-field">
         <label>Dismissal Type</label>
-        <select id="dismissalType">
+        <select id="dismissalType" onchange="toggleRunOutRunsRow()">
           <option value="Bowled">Bowled</option>
           <option value="Caught">Caught</option>
           <option value="LBW">LBW</option>
           <option value="Run Out">Run Out</option>
           <option value="Stumped">Stumped</option>
           <option value="Hit Wicket">Hit Wicket</option>
+        </select>
+      </div>
+      <div class="input-field" id="runOutRunsRow" style="display: none;">
+        <label>Runs Completed Before Run Out</label>
+        <select id="runOutRunsSelect">
+          <option value="0">0 Runs (No runs completed)</option>
+          <option value="1">1 Run (Batsmen crossed, 1 run added)</option>
+          <option value="2">2 Runs (2 runs completed)</option>
         </select>
       </div>
       <div class="input-field">
@@ -2185,6 +2288,49 @@
     <div class="modal-footer">
       <button class="btn-modal btn-modal-cancel" onclick="closeWicketModal()">Cancel</button>
       <button class="btn-modal btn-modal-confirm" onclick="confirmWicket()">Confirm Out</button>
+    </div>
+  </div>
+</div>
+
+<!-- EXTRAS / MULTI-RUNS MODAL -->
+<div class="modal-overlay" id="extrasModal">
+  <div class="modal-card">
+    <div class="modal-header" style="background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);">
+      <span>Record Extras / Multi-Runs</span>
+      <span class="modal-close-btn" onclick="closeExtrasModal()">&times;</span>
+    </div>
+    <div class="modal-body">
+      <div class="input-field">
+        <label>Extra Delivery Type</label>
+        <select id="customExtraType" onchange="onExtraTypeChange()">
+          <option value="wide">Wide (WD)</option>
+          <option value="noball">No Ball (NB)</option>
+          <option value="bye">Bye (B)</option>
+          <option value="legbye">Leg Bye (LB)</option>
+          <option value="penalty">Penalty Runs</option>
+        </select>
+      </div>
+      <div class="input-field" id="extraRunsField">
+        <label id="extraRunsLabel">Additional Runs Ran / Off Bat</label>
+        <select id="customExtraRuns" onchange="updateExtraPreview()">
+          <option value="0">0 Runs (Standard Wide = 1 run)</option>
+          <option value="1">1 Run Ran (2 Wides total)</option>
+          <option value="2">2 Runs Ran (3 Wides total)</option>
+          <option value="3">3 Runs Ran (4 Wides total)</option>
+          <option value="4">4 Runs (5 Wides - Boundary 4)</option>
+        </select>
+      </div>
+      <div class="input-field" id="extraSwapStrikeField" style="display: flex; align-items: center; gap: 8px;">
+        <input type="checkbox" id="extraSwapStrikeCheck" style="width: 18px; height: 18px; cursor: pointer;">
+        <label for="extraSwapStrikeCheck" style="margin: 0; cursor: pointer; font-size: 13px; font-weight: 700; color: #cbd5e1;">Swap Strike (Batsmen crossed ends)</label>
+      </div>
+      <div id="extraSummaryPreview" style="background: #0d1624; border: 1px dashed #334a70; padding: 10px 14px; border-radius: 6px; font-size: 12.5px; color: #38bdf8; font-weight: 700;">
+        Preview: 1 Wide extra run added to team. 0 runs to batsman. Ball is NOT counted in over.
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-modal btn-modal-cancel" onclick="closeExtrasModal()">Cancel</button>
+      <button class="btn-modal btn-modal-confirm" style="background: linear-gradient(135deg, #7c3aed 0%, #9333ea 100%);" onclick="confirmCustomExtra()">Record Delivery</button>
     </div>
   </div>
 </div>
@@ -2944,9 +3090,18 @@ function populateDropdowns() {
 }
 
 function onPlayerSelectChange() {
-  strikerId = parseInt(document.getElementById('strikerSelect').value);
-  nonStrikerId = parseInt(document.getElementById('nonStrikerSelect').value);
-  bowlerId = parseInt(document.getElementById('bowlerSelect').value);
+  const newStriker = parseInt(document.getElementById('strikerSelect').value);
+  const newNonStriker = parseInt(document.getElementById('nonStrikerSelect').value);
+  const newBowler = parseInt(document.getElementById('bowlerSelect').value);
+
+  if (newStriker === newNonStriker) {
+    alert("⚠️ Striker and Non-Striker cannot be the same batsman!");
+    populateDropdowns();
+    return;
+  }
+  strikerId = newStriker;
+  nonStrikerId = newNonStriker;
+  bowlerId = newBowler;
   updateUI();
   saveState();
 }
@@ -2988,7 +3143,7 @@ function saveSnapshot() {
   }));
 }
 
-function recordBall(runs, ballType) {
+function recordBall(runs, ballType, extraRunsRan = 0) {
   if (matchFinished) {
     alert("Match is marked finished! Click 'Resume / Edit' in the banner to continue scoring, or 'New Match' to start a new match.");
     return;
@@ -3034,23 +3189,37 @@ function recordBall(runs, ballType) {
   let ballText = runs.toString();
 
   if (ballType === 'wide') {
+    // runs is total wide runs (e.g. 1 for standard wide, 2 for wide+1, 5 for 5wd)
     extras.wide += runs;
     totalRuns += runs;
     bowler.runs += runs;
     bowler.wides += 1;
     currentOverRunsConceded += runs;
     ballText = runs > 1 ? `${runs}wd` : 'wd';
+
+    // If batsmen ran odd runs on the wide (e.g. 1 bye run on wide)
+    if (extraRunsRan % 2 === 1) {
+      swapStrikeInternal();
+    }
   } else if (ballType === 'noball') {
-    extras.noBall += 1;
+    // In cricket, runs is the runs scored off the bat (0 for standard NB, 1/2/3/4/6 if hit off bat)
+    extras.noBall += 1; // 1 penalty extra run to batting team
     totalRuns += (1 + runs);
     bowler.runs += (1 + runs);
     bowler.noBalls += 1;
-    striker.runs += runs;
-    striker.balls += 1;
-    if (runs === 4) striker.fours += 1;
-    if (runs === 6) striker.sixes += 1;
+    if (runs > 0) {
+      striker.runs += runs;
+      striker.balls += 1;
+      if (runs === 4) striker.fours += 1;
+      if (runs === 6) striker.sixes += 1;
+    }
     currentOverRunsConceded += (1 + runs);
     ballText = runs > 0 ? `${runs}nb` : 'nb';
+
+    // Rotate strike only if batsman ran odd runs off the bat
+    if (runs % 2 === 1) {
+      swapStrikeInternal();
+    }
   } else if (ballType === 'bye') {
     extras.bye += runs;
     totalRuns += runs;
@@ -3058,6 +3227,10 @@ function recordBall(runs, ballType) {
     legalBalls += 1;
     bowler.ballsDelivered += 1;
     ballText = `${runs}b`;
+
+    if (runs % 2 === 1) {
+      swapStrikeInternal();
+    }
   } else if (ballType === 'legbye') {
     extras.legBye += runs;
     totalRuns += runs;
@@ -3065,6 +3238,13 @@ function recordBall(runs, ballType) {
     legalBalls += 1;
     bowler.ballsDelivered += 1;
     ballText = `${runs}lb`;
+
+    if (runs % 2 === 1) {
+      swapStrikeInternal();
+    }
+  } else if (ballType === 'penalty') {
+    totalRuns += runs;
+    ballText = `+${runs}`;
   } else {
     // Normal runs (0, 1, 2, 3, 4, 6)
     striker.runs += runs;
@@ -3076,14 +3256,14 @@ function recordBall(runs, ballType) {
     currentOverRunsConceded += runs;
     legalBalls += 1;
     totalRuns += runs;
+
+    // Rotate strike on odd runs (1, 3, 5)
+    if (runs % 2 === 1) {
+      swapStrikeInternal();
+    }
   }
 
   currentOverBalls.push(ballText);
-
-  // Rotate strike on odd runs (1, 3, 5)
-  if (ballType !== 'wide' && (runs === 1 || runs === 3 || runs === 5)) {
-    swapStrikeInternal();
-  }
 
   // Check Over Completion (every 6 legal balls)
   checkOverCompletion(bowler, ballType);
@@ -3250,6 +3430,10 @@ function openWicketModal() {
     nextBatterSel.innerHTML = `<option value="">No more batsmen (All Out)</option>`;
   }
 
+  document.getElementById('dismissalType').value = 'Bowled';
+  document.getElementById('fielderName').value = '';
+  toggleRunOutRunsRow();
+
   document.getElementById('wicketModal').style.display = 'flex';
 }
 
@@ -3257,12 +3441,43 @@ function closeWicketModal() {
   document.getElementById('wicketModal').style.display = 'none';
 }
 
+function toggleRunOutRunsRow() {
+  const dis = document.getElementById('dismissalType').value;
+  const row = document.getElementById('runOutRunsRow');
+  if (row) {
+    row.style.display = (dis === 'Run Out') ? 'block' : 'none';
+  }
+}
+
 function confirmWicket() {
+  if (matchFinished) {
+    alert("Match is marked finished! Click 'Resume / Edit' in the banner to unlock.");
+    return;
+  }
+
+  // If previous ball finished an over, verify bowler change rule & reset active over stream
+  if (isOverJustFinished) {
+    if (lastCompletedOverBowlerId !== null && bowlerId === lastCompletedOverBowlerId) {
+      const bObj = bowlers.find(b => b.id === bowlerId);
+      const bName = bObj ? bObj.name : 'Current Bowler';
+      const proceed = confirm(`⚠️ Consecutive Over Rule:\n${bName} bowled the previous over (Over ${lastCompletedOverNum}).\nIn standard cricket rules, a bowler cannot bowl two consecutive overs.\n\nClick 'Cancel' to choose a different bowler from the dropdown, or 'OK' to proceed anyway.`);
+      if (!proceed) {
+        closeWicketModal();
+        document.getElementById('bowlerSelect').focus();
+        return;
+      }
+    }
+    isOverJustFinished = false;
+    currentOverBalls = [];
+    currentOverRunsConceded = 0;
+  }
+
   saveSnapshot();
   const disType = document.getElementById('dismissalType').value;
   const fielder = document.getElementById('fielderName').value.trim();
   const who = document.getElementById('whoOutSelect').value;
   const nextId = parseInt(document.getElementById('nextBatterSelect').value);
+  const runOutRuns = (disType === 'Run Out') ? (parseInt(document.getElementById('runOutRunsSelect').value) || 0) : 0;
 
   const striker = batsmen.find(b => b.id === strikerId);
   const nonStriker = batsmen.find(b => b.id === nonStrikerId);
@@ -3289,7 +3504,15 @@ function confirmWicket() {
     bowler.wickets += 1;
   }
 
-  currentOverBalls.push('W');
+  if (runOutRuns > 0) {
+    totalRuns += runOutRuns;
+    bowler.runs += runOutRuns;
+    currentOverRunsConceded += runOutRuns;
+    striker.runs += runOutRuns;
+  }
+
+  const ballBadgeText = runOutRuns > 0 ? `${runOutRuns}W` : 'W';
+  currentOverBalls.push(ballBadgeText);
 
   // Record Fall of Wickets
   const oversStr = `${Math.floor(legalBalls / 6)}.${legalBalls % 6}`;
@@ -3310,6 +3533,11 @@ function confirmWicket() {
     }
   }
 
+  // If run out with odd runs completed, rotate strike
+  if (runOutRuns % 2 === 1) {
+    swapStrikeInternal();
+  }
+
   checkOverCompletion(bowler, 'wicket');
   checkInningsAndMatchStatus(maxOvers * 6);
 
@@ -3317,6 +3545,111 @@ function confirmWicket() {
   populateDropdowns();
   updateUI();
   saveState();
+}
+
+// ==========================================
+// EXTRAS / MULTI-RUNS MODAL LOGIC
+// ==========================================
+function openExtrasModal() {
+  if (matchFinished) {
+    alert("Match is marked finished! Click 'Resume / Edit' in the banner to unlock.");
+    return;
+  }
+  document.getElementById('extrasModal').style.display = 'flex';
+  onExtraTypeChange();
+}
+
+function closeExtrasModal() {
+  document.getElementById('extrasModal').style.display = 'none';
+}
+
+function onExtraTypeChange() {
+  const type = document.getElementById('customExtraType').value;
+  const runsSel = document.getElementById('customExtraRuns');
+  const label = document.getElementById('extraRunsLabel');
+  const swapField = document.getElementById('extraSwapStrikeField');
+
+  if (type === 'wide') {
+    label.innerText = 'Additional Runs Ran / Overthrows';
+    runsSel.innerHTML = `
+      <option value="0">0 Runs (Standard 1 Wide)</option>
+      <option value="1">1 Run Ran (2 Wides total)</option>
+      <option value="2">2 Runs Ran (3 Wides total)</option>
+      <option value="3">3 Runs Ran (4 Wides total)</option>
+      <option value="4">4 Runs (5 Wides - Boundary 4)</option>
+    `;
+    swapField.style.display = 'flex';
+  } else if (type === 'noball') {
+    label.innerText = 'Runs Scored Off Bat by Batsman';
+    runsSel.innerHTML = `
+      <option value="0">0 Runs (Standard No Ball penalty)</option>
+      <option value="1">1 Single (2 runs total)</option>
+      <option value="2">2 Double (3 runs total)</option>
+      <option value="3">3 Three (4 runs total)</option>
+      <option value="4">4 Four Boundary (5 runs total)</option>
+      <option value="6">6 Six (7 runs total)</option>
+    `;
+    swapField.style.display = 'none';
+  } else if (type === 'bye' || type === 'legbye') {
+    label.innerText = 'Number of Byes / Leg Byes';
+    runsSel.innerHTML = `
+      <option value="1">1 Run</option>
+      <option value="2">2 Runs</option>
+      <option value="3">3 Runs</option>
+      <option value="4">4 Runs</option>
+    `;
+    swapField.style.display = 'none';
+  } else if (type === 'penalty') {
+    label.innerText = 'Penalty Runs Awarded';
+    runsSel.innerHTML = `
+      <option value="5">5 Penalty Runs</option>
+      <option value="1">1 Penalty Run</option>
+      <option value="2">2 Penalty Runs</option>
+    `;
+    swapField.style.display = 'none';
+  }
+
+  updateExtraPreview();
+}
+
+function updateExtraPreview() {
+  const type = document.getElementById('customExtraType').value;
+  const runs = parseInt(document.getElementById('customExtraRuns').value) || 0;
+  const preview = document.getElementById('extraSummaryPreview');
+
+  if (type === 'wide') {
+    const totalWd = 1 + runs;
+    preview.innerText = `Preview: ${totalWd} Wides added to team total & charged to bowler. 0 runs to batsman. Ball is NOT counted in over.`;
+  } else if (type === 'noball') {
+    const totalNb = 1 + runs;
+    preview.innerText = `Preview: ${totalNb} Runs total (1 NB penalty + ${runs} run${runs === 1 ? '' : 's'} credited to batsman). Charged to bowler. Ball is NOT counted in over.`;
+  } else if (type === 'bye') {
+    preview.innerText = `Preview: ${runs} Bye${runs === 1 ? '' : 's'} added to extras & team total. 0 runs charged to bowler. 1 legal ball counted.`;
+  } else if (type === 'legbye') {
+    preview.innerText = `Preview: ${runs} Leg Bye${runs === 1 ? '' : 's'} added to extras & team total. 0 runs charged to bowler. 1 legal ball counted.`;
+  } else if (type === 'penalty') {
+    preview.innerText = `Preview: ${runs} Penalty runs awarded to batting team. Bowler not charged. Ball not counted.`;
+  }
+}
+
+function confirmCustomExtra() {
+  const type = document.getElementById('customExtraType').value;
+  const runs = parseInt(document.getElementById('customExtraRuns').value) || 0;
+  const swapCheck = document.getElementById('extraSwapStrikeCheck').checked;
+
+  closeExtrasModal();
+
+  if (type === 'wide') {
+    const totalWideRuns = 1 + runs;
+    const ranRuns = (runs === 4) ? 0 : runs;
+    recordBall(totalWideRuns, 'wide', swapCheck ? 1 : ranRuns);
+  } else if (type === 'noball') {
+    recordBall(runs, 'noball');
+  } else if (type === 'bye' || type === 'legbye') {
+    recordBall(runs, type);
+  } else if (type === 'penalty') {
+    recordBall(runs, 'penalty');
+  }
 }
 
 // ==========================================
@@ -3595,20 +3928,25 @@ function updateUI() {
   document.getElementById('bowlerFigText').innerText = bowler ? `${bowler.wickets}-${bowler.runs} (${bOvers})` : '0-0 (0.0)';
 
   // ==========================================
-  // FIX: OVER BALLS TIMELINE DISPLAY (SHOWS ALL 6 BALLS!)
+  // FIX: OVER BALLS TIMELINE DISPLAY (ACCURATE & CLEAR LABELS)
   // ==========================================
   const overCont = document.getElementById('thisOverBalls');
   if (isOverJustFinished && lastCompletedOverBalls.length > 0) {
     // Show the entire completed over with all 6 balls!
     overCont.innerHTML = `
-      <span style="font-size:12px; font-weight:800; color:#064e3b; margin-right:4px;">Over ${lastCompletedOverNum} (Completed - 6 Balls):</span>
+      <span style="font-size:12px; font-weight:800; color:#34d399; margin-right:6px;">Over ${lastCompletedOverNum} (Completed - 6 Balls):</span>
       ${lastCompletedOverBalls.map(b => renderBallBadgeHtml(b)).join('')}
       <span class="strike-tag tag-striker" style="margin-left:8px;">Over Complete</span>
     `;
   } else if (currentOverBalls.length > 0) {
-    overCont.innerHTML = currentOverBalls.map(b => renderBallBadgeHtml(b)).join('');
+    const nextBallNum = Math.min(6, remainingBallsInOver + 1);
+    overCont.innerHTML = `
+      <span style="font-size:12px; font-weight:800; color:#cbd5e1; margin-right:6px;">Over ${completedOvers + 1}:</span>
+      ${currentOverBalls.map(b => renderBallBadgeHtml(b)).join('')}
+      <span style="font-size: 11.5px; color: #94a3b8; font-style: italic; margin-left: 8px;">(Ball ${nextBallNum} of 6 next)</span>
+    `;
   } else {
-    overCont.innerHTML = `<span style="font-size: 12px; color: #94a3b8; font-style: italic;">Ready for next delivery (Ball 1 of ${completedOvers + 1})</span>`;
+    overCont.innerHTML = `<span style="font-size: 12px; color: #94a3b8; font-style: italic;">Over ${completedOvers + 1} &bull; Ready for next delivery (Ball 1 of 6)</span>`;
   }
 
   // Innings Tab Visibility & Names
@@ -3647,9 +3985,14 @@ function renderBallBadgeHtml(b) {
   let badgeClass = 'badge-dot';
   if (b === '4') badgeClass = 'badge-four';
   else if (b === '6') badgeClass = 'badge-six';
-  else if (b === 'W') badgeClass = 'badge-wicket';
-  else if (b.includes('wd') || b.includes('nb') || b.includes('b') || b.includes('lb')) badgeClass = 'badge-extra';
-  else if (parseInt(b) > 0) badgeClass = 'badge-run';
+  else if (b === 'W' || b.endsWith('W')) badgeClass = 'badge-wicket';
+  else if (b.includes('wd') || b.includes('nb') || b.includes('b') || b.includes('lb') || b.startsWith('+')) {
+    if (b.includes('4nb') || b.includes('5wd')) badgeClass = 'badge-four';
+    else if (b.includes('6nb')) badgeClass = 'badge-six';
+    else badgeClass = 'badge-extra';
+  } else if (parseInt(b) > 0) {
+    badgeClass = 'badge-run';
+  }
   return `<div class="ball-badge ${badgeClass}">${b}</div>`;
 }
 
